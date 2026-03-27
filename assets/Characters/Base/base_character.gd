@@ -3,7 +3,14 @@ class_name BaseCharacter
 
 @export var current_cell : Vector2i = Vector2i(5,5)
 @export var map_interface: MapInterface
+@export var Direction : Directions.Points = Directions.Points.EAST
 
+const DIRECTION_SUFFIXES: = {
+	Directions.Points.NORTH: "_N",
+	Directions.Points.EAST: "_E",
+	Directions.Points.SOUTH: "_S",
+	Directions.Points.WEST: "_W",
+}
 var is_moving = false
 
 # Called when the node enters the scene tree for the first time.
@@ -14,9 +21,16 @@ func _ready() -> void:
 	map_interface.pathfind.add_character(current_cell)
 	
 
+func play() -> void: 
+	var sequence_suffix: String = DIRECTION_SUFFIXES.get(Direction, "_E") 
+	if is_moving:
+		$AnimatedSprite2D.play("walk_no_weapon" +  sequence_suffix)
+	else:
+		$AnimatedSprite2D.play("idle_no_weapon" +  sequence_suffix)
+		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	pass
+	play()
 	
 func _on_move_requested(target: Vector2i):
 	
@@ -24,29 +38,38 @@ func _on_move_requested(target: Vector2i):
 		return
 		
 	is_moving = true
-	
+		
 	var old_pos = current_cell
 	map_interface.pathfind.remove_character(old_pos)
 	
 	var path = map_interface.pathfind.astar_grid.get_id_path(old_pos, target)
-	
+
 	map_interface.pathfind.add_character(target)
 	
 	if path.size() == 0:
 		is_moving = false
 		return
-		
+	
+	calc_direction(path[0], path[1])
 	
 	var move_tween: Tween = create_tween()
-	
-	var path_length = path.size() - 1
+			
 	for step_index in range(1, path.size()):
-		var step = path[step_index]
-		var pixel_step = MapHelpers.cell_to_pixel(step)
+		var step = Vector2i(path[step_index])
+		var pixel_step = MapHelpers.cell_to_pixel(step)	
 		move_tween.tween_property(self, "position", pixel_step, 0.2)
 		
+	move_tween.connect("step_finished", func(idx : int): 
+		if idx < path.size() - 2:
+			calc_direction(path[idx], path[idx + 1])	
+		else:
+			calc_direction(path[idx - 1], path[idx])	
+		)
+	
 	move_tween.tween_callback(func(): is_moving = false)
 	
 	current_cell = target
 
+func calc_direction(from : Vector2i, to: Vector2i):
+	Direction = Directions.vector_to_direction(to - from)
 	

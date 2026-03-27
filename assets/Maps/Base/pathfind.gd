@@ -36,5 +36,4 @@ func load_wall():
 	for cell_pos in cell_positions:
 		var cell = walls.get_cell_tile_data(cell_pos)
 		if bool(cell.get_custom_data("IsBlocked")):
-			print(cell_pos)
 			astar_grid.set_point_solid(cell_pos, true)
