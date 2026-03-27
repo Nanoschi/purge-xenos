@@ -53,18 +53,18 @@ func _on_move_requested(target: Vector2i):
 	calc_direction(path[0], path[1])
 	
 	var move_tween: Tween = create_tween()
+	
+	move_tween.step_finished.connect(func(idx : int): 
+		if idx < path.size() - 2:
+			calc_direction(path[idx + 1], path[idx + 2])	
+		else:
+			calc_direction(path[idx - 1], path[idx])	
+		)
 			
 	for step_index in range(1, path.size()):
 		var step = Vector2i(path[step_index])
 		var pixel_step = MapHelpers.cell_to_pixel(step)	
 		move_tween.tween_property(self, "position", pixel_step, 0.2)
-		
-	move_tween.connect("step_finished", func(idx : int): 
-		if idx < path.size() - 2:
-			calc_direction(path[idx], path[idx + 1])	
-		else:
-			calc_direction(path[idx - 1], path[idx])	
-		)
 	
 	move_tween.tween_callback(func(): is_moving = false)
 	
