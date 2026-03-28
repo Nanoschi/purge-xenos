@@ -4,14 +4,9 @@ class_name MapInterface
 @export 
 var pathfind: Pathfind
 
-@export
-var floor: MapFloor
+@onready var map_floor: MapFloor = $Floor
+@onready var map_walls: Node2D = $Walls
+@onready var map_interior: Node2D = $Interior
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	pass
+func is_tile_walk_selectable(pos: Vector2i) -> bool:
+	return pathfind.astar_grid.region.has_point(pos) and not pathfind.astar_grid.is_point_solid(pos)

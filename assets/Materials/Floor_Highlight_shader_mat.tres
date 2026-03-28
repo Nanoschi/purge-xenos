@@ -1,6 +1,6 @@
 [gd_resource type="ShaderMaterial" format=3 uid="uid://dsvq6nw143t1j"]
 
-[ext_resource type="Shader" uid="uid://c345ej03vklh7" path="res://assets/Materials/Floor_Highlight_shader_mat.gdshader" id="1_3k2ti"]
+[ext_resource type="Shader" uid="uid://c345ej03vklh7" path="res://assets/Materials/floor_highlight.gdshader" id="1_3k2ti"]
 [ext_resource type="Texture2D" uid="uid://3jkq4q15nr4j" path="res://assets/Materials/tile_highlight_rect_texture.png" id="2_xwjee"]
 
 [resource]
@@ -8,7 +8,4 @@ shader = ExtResource("1_3k2ti")
 shader_parameter/overlay_texture = ExtResource("2_xwjee")
 shader_parameter/color = Color(0.85221976, 0.5366135, 0.22965482, 1)
 shader_parameter/pulse_speed = 3.0
-shader_parameter/base_opacity = 0.0
-shader_parameter/highlight_opacity = 0.9
-shader_parameter/distance_scaling = 32.0
-shader_parameter/mouse_position = Vector2(16, 16)
+shader_parameter/opacity = 0.4

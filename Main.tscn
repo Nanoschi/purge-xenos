@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://c3jv1tmo0vecv" path="res://assets/Maps/map.gd" id="1_r0du0"]
 [ext_resource type="PackedScene" uid="uid://d0d3wfy2eueti" path="res://assets/Characters/Base/BaseCharacter.tscn" id="2_cm0pq"]
 [ext_resource type="PackedScene" uid="uid://b3qc3esm2jrpm" path="res://assets/Maps/Base/BaseMap.tscn" id="3_fos0i"]
+[ext_resource type="Script" uid="uid://dwwt8xxhmunnb" path="res://assets/UI/Main/cursor_manager.gd" id="4_cm0pq"]
+[ext_resource type="PackedScene" uid="uid://dqh4254o3w1d6" path="res://assets/Maps/tile_highlight.tscn" id="5_fos0i"]
 
 [node name="Main" type="Node2D" unique_id=1619049666]
 
@@ -11,11 +13,19 @@ script = ExtResource("1_r0du0")
 
 [node name="BaseMap" parent="Map" unique_id=1207446625 instance=ExtResource("3_fos0i")]
 
-[node name="Player" parent="Map" unique_id=1271547261 node_paths=PackedStringArray("map_interface") instance=ExtResource("2_cm0pq")]
+[node name="Player" parent="Map" unique_id=1271547261 node_paths=PackedStringArray("map_interface", "cursor_manager") instance=ExtResource("2_cm0pq")]
 position = Vector2(80, 80)
 current_cell = Vector2i(2, 2)
 map_interface = NodePath("../BaseMap")
+cursor_manager = NodePath("../../CursorManager")
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=574880625]
-position = Vector2(352, 214)
+[node name="Camera2D" type="Camera2D" parent="Map/Player" unique_id=574880625]
 zoom = Vector2(2, 2)
+position_smoothing_enabled = true
+position_smoothing_speed = 10.0
+
+[node name="CursorManager" type="Node" parent="." unique_id=1069659580 node_paths=PackedStringArray("map_interface")]
+script = ExtResource("4_cm0pq")
+map_interface = NodePath("../Map/BaseMap")
+
+[node name="TileHighlight" parent="CursorManager" unique_id=1758861644 instance=ExtResource("5_fos0i")]

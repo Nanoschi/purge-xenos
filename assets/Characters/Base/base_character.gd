@@ -3,6 +3,7 @@ class_name BaseCharacter
 
 @export var current_cell : Vector2i = Vector2i(5,5)
 @export var map_interface: MapInterface
+@export var cursor_manager: CursorManager
 @export var Direction : Directions.Points = Directions.Points.EAST
 
 const DIRECTION_SUFFIXES: = {
@@ -15,7 +16,7 @@ var is_moving = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	map_interface.floor.move_requested.connect(_on_move_requested)
+	cursor_manager.move_requested.connect(_on_move_requested)
 	var current_pixel_pos = MapHelpers.cell_to_pixel(current_cell)
 	self.position = current_pixel_pos
 	map_interface.pathfind.add_character(current_cell)
