@@ -7,7 +7,6 @@
 [node name="Main" type="Node2D" unique_id=1619049666]
 
 [node name="Map" type="Node2D" parent="." unique_id=822142112]
-y_sort_enabled = true
 script = ExtResource("1_r0du0")
 
 [node name="BaseMap" parent="Map" unique_id=1207446625 instance=ExtResource("3_fos0i")]

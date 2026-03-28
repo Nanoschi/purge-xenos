@@ -1,0 +1,121 @@
+[gd_scene format=3 uid="uid://bjaasdkrjmyo5"]
+
+[ext_resource type="Script" uid="uid://c67kr5cyeyyjc" path="res://assets/UI/Main/start_menu.gd" id="1_clevf"]
+[ext_resource type="Texture2D" uid="uid://bhtt2n1q0knyn" path="res://assets/UI/Main/background_main_menu.png" id="1_ubtma"]
+[ext_resource type="Script" uid="uid://bxws5ehm6lmto" path="res://assets/UI/Main/btn_new_game.gd" id="3_t6cc1"]
+[ext_resource type="Script" uid="uid://dsm66xcvv6wsx" path="res://assets/UI/Main/btn_settings.gd" id="4_m1vf1"]
+[ext_resource type="Script" uid="uid://dbu2rxmbv7ih3" path="res://assets/UI/Main/btn_quit.gd" id="5_1wpn8"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ubtma"]
+texture = ExtResource("1_ubtma")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vnnch"]
+bg_color = Color(0.17641908, 0.17641911, 0.17641899, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_size = 6
+shadow_offset = Vector2(3, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ubtma"]
+bg_color = Color(0.23392558, 0.2339254, 0.23392549, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0.15967023, 0.15967041, 0.1596703, 0.57254905)
+shadow_size = 6
+shadow_offset = Vector2(3, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_clevf"]
+bg_color = Color(0.21950114, 0.21950093, 0.21950108, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_size = 6
+shadow_offset = Vector2(3, 3)
+
+[node name="StartMenu" type="Control" unique_id=869269760]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_clevf")
+
+[node name="Panel" type="Panel" parent="." unique_id=1909683005]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_ubtma")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=143656651]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -283.5
+offset_top = -203.0
+offset_right = 283.5
+offset_bottom = 203.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="BtnNewGame" type="Button" parent="VBoxContainer" unique_id=1158329211]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_vnnch")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ubtma")
+theme_override_styles/hover = SubResource("StyleBoxFlat_clevf")
+text = "New Game"
+script = ExtResource("3_t6cc1")
+
+[node name="BtnSettings" type="Button" parent="VBoxContainer" unique_id=254888585]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_vnnch")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ubtma")
+theme_override_styles/hover = SubResource("StyleBoxFlat_clevf")
+text = "Settings"
+script = ExtResource("4_m1vf1")
+
+[node name="BtnQuit" type="Button" parent="VBoxContainer" unique_id=1371813649]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_vnnch")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ubtma")
+theme_override_styles/hover = SubResource("StyleBoxFlat_clevf")
+text = "Quit Game"
+script = ExtResource("5_1wpn8")
+
+[node name="Label" type="Label" parent="." unique_id=1076285133]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -384.0
+offset_bottom = -148.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 128
+text = "Purge Xenos"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="VBoxContainer/BtnNewGame" to="." method="_on_btn_new_game_pressed"]
+[connection signal="pressed" from="VBoxContainer/BtnSettings" to="." method="_on_btn_settings_pressed"]
+[connection signal="pressed" from="VBoxContainer/BtnQuit" to="." method="_on_btn_quit_pressed"]

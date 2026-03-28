@@ -24,6 +24,10 @@ MapHelpers="*uid://bvwx7ueuw6kbv"
 window/size/viewport_width=1980
 window/size/viewport_height=1080
 
+[dotnet]
+
+project/assembly_name="purge_xenos_02"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
