@@ -11,7 +11,7 @@ var astar_grid = AStarGrid2D.new()
 func _ready() -> void:
 	astar_grid.region.position = map_floor.get_used_rect().position
 	astar_grid.region.size = map_floor.get_used_rect().size
-	astar_grid.cell_size = map_floor.tile_set.tile_size * 2
+	astar_grid.cell_size = map_floor.tile_set.tile_size
 	astar_grid.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	astar_grid.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	astar_grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
