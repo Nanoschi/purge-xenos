@@ -1,9 +1,0 @@
-[gd_scene format=3 uid="uid://dqh4254o3w1d6"]
-
-[ext_resource type="Material" uid="uid://dsvq6nw143t1j" path="res://assets/Materials/Floor_Highlight_shader_mat.tres" id="1_vffbp"]
-[ext_resource type="Texture2D" uid="uid://3jkq4q15nr4j" path="res://assets/Materials/tile_highlight_rect_texture.png" id="2_p4qlu"]
-
-[node name="TileHighlight" type="Sprite2D" unique_id=1758861644]
-material = ExtResource("1_vffbp")
-scale = Vector2(3, 3)
-texture = ExtResource("2_p4qlu")

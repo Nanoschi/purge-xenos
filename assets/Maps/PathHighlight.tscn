@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://dxx5ytoymhb4r"]
+
+[ext_resource type="Shader" uid="uid://5cw8hvwe4d28" path="res://assets/Materials/path_highlight.gdshader" id="1_bi8vu"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_q3wod"]
+shader = ExtResource("1_bi8vu")
+shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/pulse_speed = 3.0
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_w1mca"]
+size = Vector2(32, 32)
+
+[node name="Sprite2D" type="Sprite2D" unique_id=1009031040]
+material = SubResource("ShaderMaterial_q3wod")
+texture = SubResource("PlaceholderTexture2D_w1mca")

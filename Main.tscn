@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://d0d3wfy2eueti" path="res://assets/Characters/Base/BaseCharacter.tscn" id="2_cm0pq"]
 [ext_resource type="PackedScene" uid="uid://b3qc3esm2jrpm" path="res://assets/Maps/Base/BaseMap.tscn" id="3_fos0i"]
 [ext_resource type="Script" uid="uid://dwwt8xxhmunnb" path="res://assets/UI/Main/cursor_manager.gd" id="4_cm0pq"]
-[ext_resource type="PackedScene" uid="uid://dqh4254o3w1d6" path="res://assets/Maps/tile_highlight.tscn" id="5_fos0i"]
+[ext_resource type="PackedScene" uid="uid://dqh4254o3w1d6" path="res://assets/Maps/TileHighlight.tscn" id="5_fos0i"]
 
 [node name="Main" type="Node2D" unique_id=1619049666]
 
@@ -35,8 +35,11 @@ current_cell = Vector2i(9, 1)
 map_interface = NodePath("../Map/BaseMap")
 Direction = 3
 
-[node name="CursorManager" type="Node" parent="." unique_id=1069659580 node_paths=PackedStringArray("map_interface")]
+[node name="CursorManager" type="Node" parent="." unique_id=1069659580 node_paths=PackedStringArray("map_interface", "player")]
 script = ExtResource("4_cm0pq")
 map_interface = NodePath("../Map/BaseMap")
+player = NodePath("../Map/Player")
 
 [node name="TileHighlight" parent="CursorManager" unique_id=1758861644 instance=ExtResource("5_fos0i")]
+
+[node name="PathDots" type="Node" parent="CursorManager" unique_id=1978934507]

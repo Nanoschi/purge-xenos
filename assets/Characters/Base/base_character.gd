@@ -1,10 +1,14 @@
-@tool extends Marker2D
+extends Marker2D
 class_name BaseCharacter
 
 @export var current_cell : Vector2i = Vector2i(5,5)
 @export var map_interface: MapInterface
 @export var cursor_manager: CursorManager
 @export var Direction : Directions.Points = Directions.Points.EAST
+
+@onready var sprite = $AnimatedSprite2D
+
+var actions = 5
 	 
 const DIRECTION_SUFFIXES: = {
 	Directions.Points.NORTH: "_N",
@@ -27,9 +31,9 @@ func _ready() -> void:
 func play() -> void: 
 	var sequence_suffix: String = DIRECTION_SUFFIXES.get(Direction, "_E") 
 	if is_moving:
-		$AnimatedSprite2D.play("walk_no_weapon" +  sequence_suffix)
+		sprite.play("walk_no_weapon" +  sequence_suffix)
 	else:
-		$AnimatedSprite2D.play("idle_no_weapon" +  sequence_suffix)
+		sprite.play("idle_no_weapon" +  sequence_suffix)
 		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
@@ -37,19 +41,30 @@ func _process(_delta: float) -> void:
 		position = MapHelpers.cell_to_pixel(current_cell)
 	play()
 	
-func _on_move_requested(target: Vector2i):
+func get_preferred_path_to(target: Vector2i) -> Array[Vector2i]:
+	map_interface.pathfind.remove_character(current_cell)
 	
+	var path = map_interface.pathfind.astar_grid.get_id_path(current_cell, target)
+
+	map_interface.pathfind.add_character(current_cell)
+	return path
+	
+func _on_move_requested(target: Vector2i):
 	if is_moving:
 		return
-		
-	is_moving = true
 		
 	var old_pos = current_cell
 	map_interface.pathfind.remove_character(old_pos)
 	
 	var path = map_interface.pathfind.astar_grid.get_id_path(old_pos, target)
-
+	
+	if path.size() - 1 > actions:
+		path = path.slice(0, actions + 1)
+		target = path[-1]
+		
 	map_interface.pathfind.add_character(target)
+	
+	is_moving = true
 	
 	if path.size() == 0:
 		is_moving = false

@@ -6,6 +6,6 @@
 [resource]
 shader = ExtResource("1_3k2ti")
 shader_parameter/overlay_texture = ExtResource("2_xwjee")
-shader_parameter/color = Color(0.85221976, 0.5366135, 0.22965482, 1)
+shader_parameter/color = Color(0.8509804, 0.5372549, 0.23137255, 1)
 shader_parameter/pulse_speed = 3.0
 shader_parameter/opacity = 0.4
