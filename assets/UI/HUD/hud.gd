@@ -1,11 +1,13 @@
+class_name HUD
 extends CanvasLayer
 
-@export var Player : BaseCharacter
+var active_player : BaseCharacter
 
-signal player_turn_end(player : BaseCharacter)
+func _ready() -> void:
+	SignalBus.on_player_begin_turn.connect(_on_player_begin_turn)
+
+func	 _on_player_begin_turn(player : BaseCharacter) -> void:
+	active_player = player
 
 func _on_btn_end_turn_pressed() -> void:
-	if Player == null:
-		push_error("Player is not set")
-		return
-	player_turn_end.emit(Player)
+	SignalBus.on_hud_player_end_turn.emit(active_player)

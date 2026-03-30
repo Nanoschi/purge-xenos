@@ -10,6 +10,16 @@ extends Resource
 
 @export var cost : int = 0
 
+@export var action_type : ActionType = ActionType.NONE
+
+enum ActionType{
+	NONE,
+	HEAL,
+	MEGA_PEW_PEW,
+	MOVE,
+	PEW_PEW
+}
+
 enum ValidTargetFlags {
 	NONE = 0,
 	SELF = 1 << 0,

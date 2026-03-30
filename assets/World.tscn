@@ -16,8 +16,7 @@
 [node name="World" type="Node2D" unique_id=2008988094]
 
 [node name="Starfield" parent="." unique_id=1854515856 instance=ExtResource("1_nnxh6")]
-position = Vector2(-618, -482)
-scale = Vector2(3, 3)
+position = Vector2(-19, 62)
 
 [node name="Map" type="Node2D" parent="." unique_id=310405399]
 script = ExtResource("2_ks3hr")

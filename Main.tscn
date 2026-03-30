@@ -6,5 +6,5 @@
 [node name="Main" type="Node2D" unique_id=1619049666]
 script = ExtResource("1_trn2v")
 
-[node name="HUD" parent="." unique_id=488963275 node_paths=PackedStringArray("Player") instance=ExtResource("13_c6i3y")]
-Player = NodePath("")
+[node name="HUD" parent="." unique_id=488963275 instance=ExtResource("13_c6i3y")]
+unique_name_in_owner = true

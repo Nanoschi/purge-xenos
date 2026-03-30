@@ -52,7 +52,7 @@ size_flags_vertical = 3
 handle_input_locally = false
 msaa_2d = 1
 canvas_item_default_texture_filter = 0
-size = Vector2i(1600, 746)
+size = Vector2i(1600, 750)
 render_target_update_mode = 4
 
 [node name="World" parent="VertAlign/WorldViewportContainer/WorldViewport" unique_id=2008988094 instance=ExtResource("2_ymj7e")]

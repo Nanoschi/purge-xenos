@@ -23,8 +23,20 @@ shader_parameter/use_step = true
 
 [node name="Starfield" type="Node2D" unique_id=1854515856]
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=1765101340]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1556890890]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -240.0
+offset_right = 1600.0
+offset_bottom = 840.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ColorRect" type="ColorRect" parent="PanelContainer" unique_id=1765101340]
 material = SubResource("ShaderMaterial_ele5h")
-offset_right = 640.0
-offset_bottom = 480.0
+custom_minimum_size = Vector2(640, 480)
+layout_mode = 2
 mouse_filter = 2

@@ -7,5 +7,6 @@ script = ExtResource("1_pp1iw")
 display_name = "Heal"
 description = "Heals the target"
 heal = 5
+action_type = 1
 valid_target_flags = 2
 metadata/_custom_type_script = "uid://bcseivrinftr5"

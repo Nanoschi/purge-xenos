@@ -34,7 +34,8 @@ func _ready() -> void:
 	if is_player:
 		assert(is_instance_valid(cursor_manager), "CursorManager not set for Player: %d" % PlayerIndex)
 		cursor_manager.move_requested.connect(_on_move_requested)
-			
+		#SignalBus.on_hud_player_end_turn.connect()
+				
 	var current_pixel_pos = MapHelpers.cell_to_pixel(current_cell)
 	self.position = current_pixel_pos
 	map_interface.pathfind.add_character(current_cell)
@@ -111,24 +112,17 @@ func calc_direction(from : Vector2i, to: Vector2i):
 func start_turn():
 	print("Character (%d) turn started" % PlayerIndex)
 	if is_player:
-
-		# do stuff
-		#var wait_time = randf_range(1.0, 3.5)
-		#await get_tree().create_timer(wait_time).timeout
-		#
-		selected_action = combat_actions[0] # Move
-		#excecute_action_on_cell(selected_action, Vector2i(3,3))
-		#
-		#wait_time = randf_range(1.0, 3.5)
-		#await get_tree().create_timer(wait_time).timeout
-		#
-		#selected_action = combat_actions[1]
-		#excecute_action_on_character(selected_action, $"../Enemy")
-		#
-		var wait_time = 10
-		await get_tree().create_timer(wait_time).timeout
+		SignalBus.on_player_begin_turn.emit(self)
+		while true:
+			# notify the hud
 				
-		end_turn()
+			# do stuff
+	
+			#selected_action = combat_actions[0] # Move
+			var player = await SignalBus.on_hud_player_end_turn
+			print("awaited")
+			if player == self:
+				end_turn()
 	else:
 		# do AI stuff
 		var wait_time = randf_range(1.0, 3.5)

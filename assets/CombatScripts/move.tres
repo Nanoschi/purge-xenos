@@ -7,5 +7,6 @@ script = ExtResource("1_ixsks")
 display_name = "Move"
 description = "Moves the character"
 movement = 5
+action_type = 3
 valid_target_flags = 8
 metadata/_custom_type_script = "uid://bcseivrinftr5"

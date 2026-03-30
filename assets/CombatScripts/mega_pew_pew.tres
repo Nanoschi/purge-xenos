@@ -7,5 +7,6 @@ script = ExtResource("1_xubi4")
 display_name = "Mega Pew Pew"
 description = "Kaboom"
 damage = 100
+action_type = 2
 valid_target_flags = 4
 metadata/_custom_type_script = "uid://bcseivrinftr5"
