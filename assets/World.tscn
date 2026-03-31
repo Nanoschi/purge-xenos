@@ -5,13 +5,36 @@
 [ext_resource type="PackedScene" uid="uid://b3qc3esm2jrpm" path="res://assets/Maps/Base/BaseMap.tscn" id="3_yrx4r"]
 [ext_resource type="PackedScene" uid="uid://d0d3wfy2eueti" path="res://assets/Characters/Base/BaseCharacter.tscn" id="4_lp28i"]
 [ext_resource type="Script" uid="uid://bcseivrinftr5" path="res://assets/CombatScripts/combat_action.gd" id="5_x3gwp"]
-[ext_resource type="Resource" uid="uid://d3nshxs4lelbg" path="res://assets/CombatScripts/move.tres" id="6_tux6n"]
-[ext_resource type="Resource" uid="uid://c3vo0if8yieak" path="res://assets/CombatScripts/pew_pew.tres" id="7_r2gn0"]
-[ext_resource type="Resource" uid="uid://pvp63ekg0n3o" path="res://assets/CombatScripts/mega_pew_pew.tres" id="8_fu6kp"]
-[ext_resource type="Resource" uid="uid://bviauijb2vfwk" path="res://assets/CombatScripts/heal.tres" id="9_o1wuh"]
+[ext_resource type="PackedScene" uid="uid://ddbhnpa6kr834" path="res://assets/Maps/AttackHighlight.tscn" id="9_lnj3o"]
 [ext_resource type="Script" uid="uid://cg6vfahkwrwql" path="res://assets/Globals/battle_driver.gd" id="10_511c5"]
 [ext_resource type="Script" uid="uid://dwwt8xxhmunnb" path="res://assets/UI/Main/cursor_manager.gd" id="11_hb4n5"]
 [ext_resource type="PackedScene" uid="uid://dqh4254o3w1d6" path="res://assets/Maps/TileHighlight.tscn" id="12_afm58"]
+
+[sub_resource type="Resource" id="Resource_rh5yp"]
+script = ExtResource("5_x3gwp")
+movement = 5
+valid_target_flags = 8
+metadata/_custom_type_script = "uid://bcseivrinftr5"
+
+[sub_resource type="Resource" id="Resource_lnj3o"]
+script = ExtResource("5_x3gwp")
+damage = 10
+valid_target_flags = 4
+metadata/_custom_type_script = "uid://bcseivrinftr5"
+
+[sub_resource type="Resource" id="Resource_syi7k"]
+script = ExtResource("5_x3gwp")
+display_name = "Pew pew"
+damage = 8
+valid_target_flags = 4
+metadata/_custom_type_script = "uid://bcseivrinftr5"
+
+[sub_resource type="Resource" id="Resource_i56g8"]
+script = ExtResource("5_x3gwp")
+display_name = "Healing"
+heal = 6
+valid_target_flags = 1
+metadata/_custom_type_script = "uid://bcseivrinftr5"
 
 [node name="World" type="Node2D" unique_id=2008988094]
 
@@ -28,26 +51,35 @@ position = Vector2(80, 78)
 current_cell = Vector2i(3, 3)
 map_interface = NodePath("..")
 cursor_manager = NodePath("../../../CursorManager")
-combat_actions = Array[ExtResource("5_x3gwp")]([ExtResource("6_tux6n"), ExtResource("7_r2gn0"), ExtResource("8_fu6kp")])
+combat_actions = Dictionary[int, ExtResource("5_x3gwp")]({
+3: SubResource("Resource_rh5yp"),
+4: SubResource("Resource_lnj3o")
+})
 
 [node name="Camera" type="Camera2D" parent="Map/BaseMap/Player" unique_id=466432822]
 position = Vector2(47, 26)
 zoom = Vector2(2, 2)
 
-[node name="Enemy" parent="Map/BaseMap" unique_id=1446565566 node_paths=PackedStringArray("map_interface") instance=ExtResource("4_lp28i")]
+[node name="Enemy" parent="Map/BaseMap" unique_id=1446565566 node_paths=PackedStringArray("map_interface", "cursor_manager") instance=ExtResource("4_lp28i")]
 position = Vector2(304, 46)
 current_cell = Vector2i(9, 1)
 map_interface = NodePath("..")
+cursor_manager = NodePath("../../../CursorManager")
 Direction = 3
-combat_actions = Array[ExtResource("5_x3gwp")]([ExtResource("6_tux6n"), ExtResource("7_r2gn0"), ExtResource("9_o1wuh")])
+combat_actions = Dictionary[int, ExtResource("5_x3gwp")]({
+4: SubResource("Resource_syi7k")
+})
 PlayerIndex = -1
 
-[node name="Enemy2" parent="Map/BaseMap" unique_id=181591867 node_paths=PackedStringArray("map_interface") instance=ExtResource("4_lp28i")]
+[node name="Enemy2" parent="Map/BaseMap" unique_id=181591867 node_paths=PackedStringArray("map_interface", "cursor_manager") instance=ExtResource("4_lp28i")]
 position = Vector2(400, 46)
 current_cell = Vector2i(12, 1)
 map_interface = NodePath("..")
+cursor_manager = NodePath("../../../CursorManager")
 Direction = 0
-combat_actions = Array[ExtResource("5_x3gwp")]([ExtResource("6_tux6n"), ExtResource("7_r2gn0")])
+combat_actions = Dictionary[int, ExtResource("5_x3gwp")]({
+1: SubResource("Resource_i56g8")
+})
 PlayerIndex = -2
 
 [node name="BattleDriver" type="Node" parent="." unique_id=1431973565 node_paths=PackedStringArray("Players", "Enemies")]
@@ -56,13 +88,16 @@ Players = [NodePath("../Map/BaseMap/Player")]
 Enemies = [NodePath("../Map/BaseMap/Enemy"), NodePath("../Map/BaseMap/Enemy2")]
 metadata/_custom_type_script = "uid://cg6vfahkwrwql"
 
-[node name="CursorManager" type="Node" parent="." unique_id=1238487192 node_paths=PackedStringArray("map_interface", "player")]
+[node name="CursorManager" type="Node" parent="." unique_id=1238487192 node_paths=PackedStringArray("map_interface", "battle_driver")]
 script = ExtResource("11_hb4n5")
 map_interface = NodePath("../Map/BaseMap")
-player = NodePath("../Map/BaseMap/Player")
+battle_driver = NodePath("../BattleDriver")
 
 [node name="TileHighlight" parent="CursorManager" unique_id=1758861644 instance=ExtResource("12_afm58")]
 visible = false
 position = Vector2(0, -21)
 
 [node name="PathDots" type="Node" parent="CursorManager" unique_id=1262149516]
+
+[node name="AttackHighlight" parent="CursorManager" unique_id=495309528 instance=ExtResource("9_lnj3o")]
+visible = false

@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://ddbhnpa6kr834"]
+
+[sub_resource type="Gradient" id="Gradient_6lqe3"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_6ypqt"]
+gradient = SubResource("Gradient_6lqe3")
+width = 32
+height = 32
+
+[node name="AttackHighlight" type="Node2D" unique_id=495309528]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=732923706]
+texture = SubResource("GradientTexture2D_6ypqt")
