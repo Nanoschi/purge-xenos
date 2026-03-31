@@ -6,34 +6,6 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sc1dx"]
 bg_color = Color(0.1254902, 0.1254902, 0.1254902, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c2ibq"]
-bg_color = Color(0.17641908, 0.17641911, 0.17641899, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-shadow_size = 6
-shadow_offset = Vector2(3, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j4qnp"]
-bg_color = Color(0.23392558, 0.2339254, 0.23392549, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-shadow_color = Color(0.15967023, 0.15967041, 0.1596703, 0.57254905)
-shadow_size = 6
-shadow_offset = Vector2(3, 3)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fpfj3"]
-bg_color = Color(0.21950114, 0.21950093, 0.21950108, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-shadow_size = 6
-shadow_offset = Vector2(3, 3)
-
 [node name="HUD" type="CanvasLayer" unique_id=1730960279]
 script = ExtResource("1_0muis")
 
@@ -62,25 +34,6 @@ custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_sc1dx")
 
-[node name="BtnEndTurn" type="Button" parent="VertAlign/MenuPanel" unique_id=2008884456]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -211.0
-offset_top = -60.0
-offset_right = -16.0
-offset_bottom = -15.0
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_font_sizes/font_size = 32
-theme_override_styles/normal = SubResource("StyleBoxFlat_c2ibq")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_j4qnp")
-theme_override_styles/hover = SubResource("StyleBoxFlat_fpfj3")
-text = "End  Turn"
-
 [node name="BtnWalk" type="Button" parent="VertAlign/MenuPanel" unique_id=37727695]
 layout_mode = 0
 offset_left = 7.0
@@ -97,6 +50,12 @@ offset_right = 124.0
 offset_bottom = 37.0
 text = "Attack"
 
-[connection signal="pressed" from="VertAlign/MenuPanel/BtnEndTurn" to="." method="_on_btn_end_turn_pressed"]
+[node name="LabelActionCount" type="Label" parent="VertAlign/MenuPanel" unique_id=193650545]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 11.0
+offset_right = 196.0
+offset_bottom = 34.0
+
 [connection signal="pressed" from="VertAlign/MenuPanel/BtnWalk" to="." method="_on_btn_walk_pressed"]
 [connection signal="pressed" from="VertAlign/MenuPanel/BtnAttack" to="." method="_on_btn_attack_pressed"]

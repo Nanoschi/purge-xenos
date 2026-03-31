@@ -14,12 +14,11 @@ signal battle_won(who : GroupTypes)
 var current_group_type : GroupTypes = GroupTypes.PLAYERS
 var current_group : Array[BaseCharacter]
 var current_character : BaseCharacter
-
+var current_character_idx = 0
 var is_battle_running = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-
 	match current_group_type:
 		GroupTypes.PLAYERS: 
 			current_group = Players
@@ -27,54 +26,40 @@ func _ready() -> void:
 			current_group = Enemies
 		_: push_error("Unkown type")
 	
-	for entity in Players + Enemies:
-		entity.action_on_cell_requested.connect(excecute_action_on_cell)
-		entity.action_on_character_requested.connect(excecute_action_on_character)
-	
 	SignalBus.battle_started.connect(start_battle)
 	
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-
 func start_battle() -> void:
-	while is_battle_running:
-		await next_round()
-
-func next_round() -> void:
+	current_character = Players[current_character_idx]
+	current_group = Players
+	SignalBus.on_player_begin_turn.emit(current_character)
+	run_turn()
 			
-	for entity in current_group:
-		current_character = entity
-		
-		entity.start_turn() # Make sure we don't miss the awaited signal in the next line.
-		var character = await entity.turn_ended
-		print("Character (%d) turn ended" % character.PlayerIndex)
+func next_turn():
+	current_character_idx += 1
 	
-	# Switch groups
-	match current_group_type:
-		GroupTypes.PLAYERS: 
+	var switch_group = current_character_idx == current_group.size()
+	
+	if switch_group:
+		if current_group_type == GroupTypes.PLAYERS:
 			current_group_type = GroupTypes.ENEMIES
 			current_group = Enemies
-		GroupTypes.ENEMIES: 
+		elif current_group_type == GroupTypes.ENEMIES:
 			current_group_type = GroupTypes.PLAYERS
 			current_group = Players
+		current_character_idx = 0
+	
+	current_character.action_finished.disconnect(_on_action_finished)
+	current_character = current_group[current_character_idx]
+	if current_group_type == GroupTypes.PLAYERS:
+		SignalBus.on_player_begin_turn.emit(current_character)
 
-func excecute_action_on_character(fromCharacter : BaseCharacter, action : CombatAction, target : BaseCharacter):
-	if fromCharacter != current_character:
-		return
-	print("Character (%d) requested action '%s' on character '%d'" % [fromCharacter.PlayerIndex, action.display_name, target.PlayerIndex])
+	run_turn()
 	
-func excecute_action_on_cell(fromCharacter : BaseCharacter,action: CombatAction,  target : Vector2i):
-	if fromCharacter != current_character:
-		return
-	print("Character (%d) requested action '%s' on cell '%s'" % [fromCharacter.PlayerIndex, action.display_name, str(target)])
-	
-	#todo: if is 'move'
-	fromCharacter._on_move_requested(target)
+func run_turn():
+	current_character.action_finished.connect(_on_action_finished)	
+	current_character.start_turn()
 		
 func on_character_died(character : BaseCharacter) -> void :
-	
 	Enemies.erase(character)
 	if Enemies.size() == 0:
 		is_battle_running = false
@@ -84,3 +69,7 @@ func on_character_died(character : BaseCharacter) -> void :
 	if Players.size() == 0:
 		is_battle_running = false
 		battle_won.emit(GroupTypes.ENEMIES)
+		
+func _on_action_finished():
+	if current_character.action_count == 0:
+		next_turn()

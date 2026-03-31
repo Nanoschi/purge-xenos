@@ -3,7 +3,6 @@ class_name CursorManager
 
 @export var map_interface: MapInterface
 @export var battle_driver: BattleDriver
-@export var player: BaseCharacter
 
 @onready var tile_highlight = $TileHighlight
 @onready var path_dots = $PathDots
@@ -20,8 +19,6 @@ const DOT_COLOR_UNREACHABLE = Vector3(1, 0, 0)
 
 var dot_material_reachable = ShaderMaterial.new()
 var dot_material_unreachable = ShaderMaterial.new()
-
-signal move_requested(target: Vector2i)
 
 func _ready() -> void:
 	dot_material_reachable.shader = PATH_HIGHLIGHT_SHADER
@@ -41,35 +38,39 @@ func _process(_delta: float) -> void:
 		tile_highlight.visible = false
 		
 func _unhandled_input(event: InputEvent) -> void:
-	if player.selected_action == null:
+	if battle_driver.current_character.selected_action == null:
 		return
 	
 	_display_selected_action(event)
 			
 func _display_selected_action(event: InputEvent):
+	if battle_driver.current_character.action_count > 0:
 		display_path_dots(event)
-		display_attack_highlight()
+		display_attack_highlight(event)
 
 func display_path_dots(event: InputEvent):
-	if player.selected_action.movement == 0:
+	if battle_driver.current_character.is_moving:
+		return
+		
+	if battle_driver.current_character.selected_action.movement == 0:
 		_update_path_dots([])	
 	elif event is InputEventMouse:
 		var mouse_pos = map_interface.map_floor.get_local_mouse_position()
 		var cell = MapHelpers.pixel_to_cell(mouse_pos)
 		if map_interface.is_tile_walk_selectable(cell):
-			if not player.is_moving:
+			if not battle_driver.current_character.is_moving:
 				if not _is_cell_targeted:
 					_is_cell_targeted = true
 					_current_targeted_cell = cell
-					_update_path_dots(player.get_preferred_path_to(cell))
+					_update_path_dots(battle_driver.current_character.get_preferred_path_to(cell))
 				elif cell != _current_targeted_cell:
 					_current_targeted_cell = cell
-					_update_path_dots(player.get_preferred_path_to(cell))
+					_update_path_dots(battle_driver.current_character.get_preferred_path_to(cell))
 				
 			if event.button_mask & MouseButton.MOUSE_BUTTON_LEFT:
-				move_requested.emit(cell)
+				battle_driver.current_character.execute_action(cell)
 				
-				if player.is_moving:
+				if battle_driver.current_character.is_moving:
 					_update_path_dots([])
 		else:
 			_is_cell_targeted = false
@@ -91,15 +92,15 @@ func _update_path_dots(path: Array[Vector2i]) -> void:
 				dot.visible = true
 				dot.position = MapHelpers.cell_to_pixel(path[i + 1])
 				var material = dot.material as ShaderMaterial
-				if i < player.selected_action.movement:
+				if i < battle_driver.current_character.selected_action.movement:
 					dot.material = dot_material_reachable
 				else:
 					dot.material = dot_material_unreachable
 			else:
 				dot.visible = false
 				
-func display_attack_highlight():
-	if player.selected_action.damage == 0:
+func display_attack_highlight(event: InputEvent):
+	if battle_driver.current_character.selected_action.damage == 0:
 		return
 		
 	var mouse_pos = map_interface.map_floor.get_local_mouse_position()
@@ -107,12 +108,15 @@ func display_attack_highlight():
 	
 	var on_valid_targ = false
 	if EnumHelpers.has_flag(
-		player.selected_action.valid_target_flags, 
+		battle_driver.current_character.selected_action.valid_target_flags, 
 		CombatAction.ValidTargetFlags.OPPONENTS):
-			if player.PlayerIndex > -1:
+			if battle_driver.current_character.is_player:
 				for enemy in battle_driver.Enemies:
 					if enemy.current_cell == target_cell:
 						on_valid_targ = true
+						
+	if event.button_mask & MouseButton.MOUSE_BUTTON_LEFT and on_valid_targ:
+		battle_driver.current_character.execute_action(target_cell)
 						
 	attack_highlight.position = MapHelpers.cell_to_pixel(target_cell)
 	attack_highlight.visible = on_valid_targ
