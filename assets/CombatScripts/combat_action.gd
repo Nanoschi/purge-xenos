@@ -7,10 +7,8 @@ extends Resource
 @export var damage : int = 0
 @export var heal : int = 0
 @export var movement : int = 0
-
+@export var path : Array[Vector2i] = []
 @export var cost : int = 0
-
-@export var action_type : ActionType = ActionType.NONE
 
 enum ActionType{
 	NONE,

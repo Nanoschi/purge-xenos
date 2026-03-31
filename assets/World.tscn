@@ -24,16 +24,12 @@ metadata/_custom_type_script = "uid://bcseivrinftr5"
 
 [sub_resource type="Resource" id="Resource_syi7k"]
 script = ExtResource("5_x3gwp")
-display_name = "Pew pew"
-damage = 8
-valid_target_flags = 4
+movement = 5
 metadata/_custom_type_script = "uid://bcseivrinftr5"
 
 [sub_resource type="Resource" id="Resource_i56g8"]
 script = ExtResource("5_x3gwp")
-display_name = "Healing"
-heal = 6
-valid_target_flags = 1
+damage = 5
 metadata/_custom_type_script = "uid://bcseivrinftr5"
 
 [node name="World" type="Node2D" unique_id=2008988094]
@@ -48,8 +44,8 @@ script = ExtResource("2_ks3hr")
 
 [node name="Player" parent="Map/BaseMap" unique_id=1271547261 node_paths=PackedStringArray("map_interface", "cursor_manager") instance=ExtResource("4_lp28i")]
 position = Vector2(80, 78)
-current_cell = Vector2i(3, 3)
 map_interface = NodePath("..")
+current_cell = Vector2i(3, 3)
 cursor_manager = NodePath("../../../CursorManager")
 combat_actions = Dictionary[int, ExtResource("5_x3gwp")]({
 3: SubResource("Resource_rh5yp"),
@@ -62,23 +58,22 @@ zoom = Vector2(2, 2)
 
 [node name="Enemy" parent="Map/BaseMap" unique_id=1446565566 node_paths=PackedStringArray("map_interface", "cursor_manager") instance=ExtResource("4_lp28i")]
 position = Vector2(304, 46)
-current_cell = Vector2i(9, 1)
 map_interface = NodePath("..")
 cursor_manager = NodePath("../../../CursorManager")
 Direction = 3
 combat_actions = Dictionary[int, ExtResource("5_x3gwp")]({
-4: SubResource("Resource_syi7k")
+3: SubResource("Resource_syi7k")
 })
 PlayerIndex = -1
 
 [node name="Enemy2" parent="Map/BaseMap" unique_id=181591867 node_paths=PackedStringArray("map_interface", "cursor_manager") instance=ExtResource("4_lp28i")]
 position = Vector2(400, 46)
-current_cell = Vector2i(12, 1)
 map_interface = NodePath("..")
+current_cell = Vector2i(9, 1)
 cursor_manager = NodePath("../../../CursorManager")
 Direction = 0
 combat_actions = Dictionary[int, ExtResource("5_x3gwp")]({
-1: SubResource("Resource_i56g8")
+4: SubResource("Resource_i56g8")
 })
 PlayerIndex = -2
 
