@@ -1,7 +1,7 @@
 extends Control
 class_name StartMenu
 
-const GAME_SCENE = preload("res://Main.tscn")
+const GAME_SCENE = preload("res://assets/UI/HUD/HUD.tscn")
 
 signal new_game
 signal show_settings

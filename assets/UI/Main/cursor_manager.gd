@@ -38,6 +38,8 @@ func _process(_delta: float) -> void:
 		tile_highlight.visible = false
 		
 func _unhandled_input(event: InputEvent) -> void:
+	if battle_driver.current_character == null:
+		return
 	if battle_driver.current_character.selected_action == null:
 		return
 	

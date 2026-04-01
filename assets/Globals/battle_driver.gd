@@ -56,6 +56,9 @@ func next_turn():
 	run_turn()
 	
 func run_turn():
+	if current_character == null:
+		print("No current character")
+		return
 	current_character.action_finished.connect(_on_action_finished)	
 	current_character.start_turn()
 		

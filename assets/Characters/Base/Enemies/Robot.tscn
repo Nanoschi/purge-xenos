@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://bel66alq5p1tk"]
+
+[ext_resource type="PackedScene" uid="uid://d0d3wfy2eueti" path="res://assets/Characters/Base/BaseCharacter.tscn" id="1_dfmki"]
+[ext_resource type="Script" uid="uid://b6f3ekm81o01h" path="res://assets/Characters/Base/Enemies/robot.gd" id="2_7tnvx"]
+
+[node name="Robot" unique_id=1271547261 instance=ExtResource("1_dfmki")]
+script = ExtResource("2_7tnvx")

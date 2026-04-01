@@ -4,7 +4,7 @@ class_name BaseCharacter
 signal action_finished
 
 @export var map_interface: MapInterface
-@export var current_cell : Vector2i = Vector2i(5,5):
+@export var current_cell : Vector2i = Vector2i(6,6):
 	set(value):
 		if current_cell == value:
 			return
@@ -152,7 +152,10 @@ func execute_move(target: Vector2i):
 	
 	current_cell = target
 	
-
+func move_delta_pixels(delta : Vector2):
+	var cell = MapHelpers.pixel_to_cell(Vector2i(position + delta))
+	execute_move(cell)
+	
 func move(path : Array[Vector2i]):
 	print("Move was called")
 	if is_moving:
