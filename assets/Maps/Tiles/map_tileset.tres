@@ -1,11 +1,6 @@
 [gd_resource type="TileSet" format=3 uid="uid://bhdi5o8sqew5x"]
 
-[ext_resource type="PackedScene" uid="uid://dlaasall4nt2p" path="res://assets/Maps/SpawnPoints/player_door_spawn.tscn" id="1_kpfc8"]
 [ext_resource type="Texture2D" uid="uid://dncoabqs3w6t" path="res://assets/Maps/Tiles/tileset_sf.png" id="1_ualee"]
-
-[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_o1mtj"]
-resource_name = "DoorSpawn"
-scenes/1/scene = ExtResource("1_kpfc8")
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7wvpd"]
 texture = ExtResource("1_ualee")
@@ -156,4 +151,3 @@ tile_size = Vector2i(32, 32)
 custom_data_layer_0/name = "IsBlocked"
 custom_data_layer_0/type = 1
 sources/1 = SubResource("TileSetAtlasSource_7wvpd")
-sources/0 = SubResource("TileSetScenesCollectionSource_o1mtj")

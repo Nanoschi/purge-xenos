@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://ykod7seiqehp"]
 
 [ext_resource type="PackedScene" uid="uid://c2wg4et87hsc6" path="res://assets/Maps/Backgrounds/Starfield/Starfield.tscn" id="1_nnxh6"]
-[ext_resource type="Script" uid="uid://c3jv1tmo0vecv" path="res://assets/Maps/map.gd" id="2_ks3hr"]
 [ext_resource type="PackedScene" uid="uid://b3qc3esm2jrpm" path="res://assets/Maps/Base/BaseMap.tscn" id="3_yrx4r"]
 [ext_resource type="PackedScene" uid="uid://ddbhnpa6kr834" path="res://assets/Maps/AttackHighlight.tscn" id="9_lnj3o"]
 [ext_resource type="Script" uid="uid://cg6vfahkwrwql" path="res://assets/Globals/battle_driver.gd" id="10_511c5"]
@@ -13,20 +12,17 @@
 [node name="Starfield" parent="." unique_id=1854515856 instance=ExtResource("1_nnxh6")]
 position = Vector2(-19, 62)
 
-[node name="Map" type="Node2D" parent="." unique_id=310405399]
-script = ExtResource("2_ks3hr")
-
-[node name="BaseMap" parent="Map" unique_id=1207446625 instance=ExtResource("3_yrx4r")]
+[node name="BaseMap" parent="." unique_id=1207446625 instance=ExtResource("3_yrx4r")]
 
 [node name="BattleDriver" type="Node" parent="." unique_id=1431973565 node_paths=PackedStringArray("Players", "Enemies")]
 script = ExtResource("10_511c5")
 Players = [null]
-Enemies = [NodePath(""), NodePath("")]
+Enemies = [null, null]
 metadata/_custom_type_script = "uid://cg6vfahkwrwql"
 
 [node name="CursorManager" type="Node" parent="." unique_id=1238487192 node_paths=PackedStringArray("map_interface", "battle_driver")]
 script = ExtResource("11_hb4n5")
-map_interface = NodePath("../Map/BaseMap")
+map_interface = NodePath("../BaseMap")
 battle_driver = NodePath("../BattleDriver")
 
 [node name="TileHighlight" parent="CursorManager" unique_id=1758861644 instance=ExtResource("12_afm58")]
