@@ -5,7 +5,7 @@ class_name EnemySpawnPoint
 
 var robot : Robot
 
-func spawn():
+func spawn() -> BaseCharacter:
 	robot = Robot.create(base_map,3, MapHelpers.pixel_to_cell(position))
 	add_child(robot)
-	SignalBus.on_enemy_spawned.emit(robot)
+	return robot

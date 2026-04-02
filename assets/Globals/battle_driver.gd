@@ -1,7 +1,7 @@
 extends Node
 class_name BattleDriver
 
-@export var Players : Array[BaseCharacter] = []
+@export var Players : Array[Player] = []
 @export var Enemies : Array[BaseCharacter] = []
 
 enum GroupTypes {
@@ -24,28 +24,26 @@ func _ready() -> void:
 	
 	match current_group_type:
 		GroupTypes.PLAYERS: 
-			current_group = Players
+			current_group.assign(Players)
 		GroupTypes.ENEMIES: 
-			current_group = Enemies
+			current_group.assign(Enemies)
 		_: push_error("Unkown type")
 	
 	SignalBus.on_hud_is_ready.connect(on_hud_is_ready)
-	SignalBus.on_player_spawned.connect(on_player_spawned)
-	SignalBus.on_enemy_spawned.connect(on_enemy_spawned)
+	SignalBus.on_all_characters_spawned.connect(on_all_characters_spawned)
 
-func on_player_spawned(player : Player):
-	Players.append(player)
-	current_character = Players[current_character_idx]
-	current_group = Players
-	SignalBus.on_character_begin_turn.emit(current_character)
-	#How to know when there will be no more spawns?
-
-func on_enemy_spawned(enemy : BaseCharacter):
-	Enemies.append(enemy)
-	SignalBus.battle_started.emit()
-	#How to know when there will be no more spawns?
-	run_turn()
+func on_all_characters_spawned(players : Array[Player], enemies : Array[BaseCharacter]):
+	Players.assign(players)
+	Enemies.assign(enemies)
 	
+	current_character = Players[current_character_idx]
+	current_group.assign(Players)
+		
+	SignalBus.battle_started.emit()
+	SignalBus.on_character_begin_turn.emit(current_character)
+	run_turn()
+
+
 func on_hud_is_ready() -> void:
 	pass
 	#current_character = Players[current_character_idx]
@@ -61,10 +59,10 @@ func next_turn():
 	if switch_group:
 		if current_group_type == GroupTypes.PLAYERS:
 			current_group_type = GroupTypes.ENEMIES
-			current_group = Enemies
+			current_group.assign(Enemies)
 		elif current_group_type == GroupTypes.ENEMIES:
 			current_group_type = GroupTypes.PLAYERS
-			current_group = Players
+			current_group.assign(Players)
 		current_character_idx = 0
 	
 	current_character.action_finished.disconnect(_on_action_finished)

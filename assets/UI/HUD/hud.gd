@@ -7,9 +7,7 @@ var active_player : BaseCharacter
 
 func _ready() -> void:
 	SignalBus.on_character_begin_turn.connect(on_character_begin_turn)
-	#SignalBus.on_player_spawned.connect(on_player_spawned)
 	SignalBus.on_hud_is_ready.emit()
-	#_on_btn_walk_pressed() # default selected action
 	
 func _process(_delta: float) -> void:
 	if active_player == null:
