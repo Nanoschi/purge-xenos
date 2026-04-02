@@ -4,13 +4,16 @@
 [ext_resource type="Script" uid="uid://bm0j5li5mj57c" path="res://assets/Maps/SpawnPoints/player_door_spawn.gd" id="1_qhmuh"]
 [ext_resource type="Script" uid="uid://wny825ghldtj" path="res://assets/Maps/SpawnPoints/animated_sprite_2d_door.gd" id="3_j3lpk"]
 
+[sub_resource type="Animation" id="Animation_j3lpk"]
+resource_name = "CloseDoor"
+
 [sub_resource type="Animation" id="Animation_hb1xk"]
 resource_name = "OpenDoor"
 length = 2.0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("RemoteTransform2D:position")
+tracks/0/path = NodePath("DummyNode:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -22,7 +25,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("RemoteTransform2D:modulate")
+tracks/1/path = NodePath("DummyNode:modulate")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -61,7 +64,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("RemoteTransform2D:position")
+tracks/0/path = NodePath("DummyNode:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -73,7 +76,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("RemoteTransform2D:modulate")
+tracks/1/path = NodePath("DummyNode:modulate")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -109,6 +112,7 @@ tracks/3/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_y6t8d"]
 _data = {
+&"CloseDoor": SubResource("Animation_j3lpk"),
 &"OpenDoor": SubResource("Animation_hb1xk"),
 &"RESET": SubResource("Animation_qhmuh")
 }
@@ -186,10 +190,7 @@ animations = [{
 "speed": 7.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_qhmuh"]
-size = Vector2(26, 39)
-
-[node name="Player_Door_Spawn" type="Marker2D" unique_id=2041129026]
+[node name="PlayerDoorSpawn" type="Marker2D" unique_id=2041129026]
 script = ExtResource("1_qhmuh")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1573043762]
@@ -201,16 +202,8 @@ animation = &"Opening"
 frame = 5
 script = ExtResource("3_j3lpk")
 
-[node name="Area2D" type="Area2D" parent="." unique_id=168645816 groups=["Player"]]
+[node name="DummyNode" type="Node2D" parent="." unique_id=895129727]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=55860616]
-visible = false
-position = Vector2(0, 0.5)
-shape = SubResource("RectangleShape2D_qhmuh")
-
-[node name="RemoteTransform2D" type="RemoteTransform2D" parent="." unique_id=2005727948]
-
-[node name="DummyMarker" type="Marker2D" parent="RemoteTransform2D" unique_id=1893251267]
+[node name="DummyMarker" type="Marker2D" parent="DummyNode" unique_id=1893251267]
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
-[connection signal="area_exited" from="Area2D" to="." method="_on_area_2d_area_exited"]

@@ -5,6 +5,8 @@
 [ext_resource type="Script" uid="uid://bj4nk162jolp4" path="res://assets/Maps/Base/map_floor.gd" id="3_wbupc"]
 [ext_resource type="PackedScene" uid="uid://dlaasall4nt2p" path="res://assets/Maps/SpawnPoints/player_door_spawn.tscn" id="5_7wvpd"]
 [ext_resource type="Script" uid="uid://cqse63usqetho" path="res://assets/Maps/Base/pathfind.gd" id="5_oj8sm"]
+[ext_resource type="PackedScene" uid="uid://c6x1bjkupvx15" path="res://assets/Maps/SpawnPoints/robot_spawn_point.tscn" id="6_7wvpd"]
+[ext_resource type="Script" uid="uid://srvs03s27m3j" path="res://assets/Maps/Base/spawnpoints.gd" id="6_v37n7"]
 
 [node name="BaseMap" type="Node2D" unique_id=1207446625 node_paths=PackedStringArray("pathfind")]
 script = ExtResource("1_wbupc")
@@ -27,6 +29,19 @@ map_floor = NodePath("../Floor")
 map_walls = NodePath("../Walls")
 map_interior = NodePath("../Interior")
 
-[node name="Player_Door_Spawn" parent="." unique_id=2041129026 node_paths=PackedStringArray("base_map") instance=ExtResource("5_7wvpd")]
+[node name="Spawnpoints" type="Node" parent="." unique_id=1076937073]
+script = ExtResource("6_v37n7")
+
+[node name="EnemySpawnPoint2" parent="Spawnpoints" unique_id=1787319171 node_paths=PackedStringArray("base_map") instance=ExtResource("6_7wvpd")]
+position = Vector2(112, 304)
+gizmo_extents = 20.0
+base_map = NodePath("../..")
+
+[node name="EnemySpawnPoint" parent="Spawnpoints" unique_id=165899254 node_paths=PackedStringArray("base_map") instance=ExtResource("6_7wvpd")]
+position = Vector2(176, 144)
+gizmo_extents = 20.0
+base_map = NodePath("../..")
+
+[node name="PlayerDoorSpawn" parent="Spawnpoints" unique_id=2041129026 node_paths=PackedStringArray("base_map") instance=ExtResource("5_7wvpd")]
 position = Vector2(14, 172)
-base_map = NodePath("..")
+base_map = NodePath("../..")

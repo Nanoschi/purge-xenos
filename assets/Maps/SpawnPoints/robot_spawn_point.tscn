@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://c6x1bjkupvx15"]
+
+[ext_resource type="Script" uid="uid://cko1ulnwrfrcf" path="res://assets/Maps/SpawnPoints/robot_spawn_point.gd" id="1_gd1kw"]
+
+[node name="EnemySpawnPoint" type="Marker2D" unique_id=165899254]
+gizmo_extents = 50.0
+script = ExtResource("1_gd1kw")

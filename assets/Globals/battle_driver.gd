@@ -29,21 +29,29 @@ func _ready() -> void:
 			current_group = Enemies
 		_: push_error("Unkown type")
 	
-	SignalBus.battle_started.connect(start_battle)
+	SignalBus.on_hud_is_ready.connect(on_hud_is_ready)
 	SignalBus.on_player_spawned.connect(on_player_spawned)
 	SignalBus.on_enemy_spawned.connect(on_enemy_spawned)
 
-func on_player_spawned(player : Player, at_cell : Vector2i):
+func on_player_spawned(player : Player):
 	Players.append(player)
-
-func on_enemy_spawned(enemy : BaseCharacter, at_cell : Vector2i):
-	Enemies.append(enemy)
-	
-func start_battle() -> void:
 	current_character = Players[current_character_idx]
 	current_group = Players
 	SignalBus.on_character_begin_turn.emit(current_character)
+	#How to know when there will be no more spawns?
+
+func on_enemy_spawned(enemy : BaseCharacter):
+	Enemies.append(enemy)
+	SignalBus.battle_started.emit()
+	#How to know when there will be no more spawns?
 	run_turn()
+	
+func on_hud_is_ready() -> void:
+	pass
+	#current_character = Players[current_character_idx]
+	#current_group = Players
+	#SignalBus.on_character_begin_turn.emit(current_character)
+	#run_turn()
 			
 func next_turn():
 	current_character_idx += 1
