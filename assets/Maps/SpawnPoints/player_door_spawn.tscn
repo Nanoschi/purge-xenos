@@ -4,6 +4,115 @@
 [ext_resource type="Script" uid="uid://bm0j5li5mj57c" path="res://assets/Maps/SpawnPoints/player_door_spawn.gd" id="1_qhmuh"]
 [ext_resource type="Script" uid="uid://wny825ghldtj" path="res://assets/Maps/SpawnPoints/animated_sprite_2d_door.gd" id="3_j3lpk"]
 
+[sub_resource type="Animation" id="Animation_hb1xk"]
+resource_name = "OpenDoor"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("RemoteTransform2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(1, 1.9666667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(32, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("RemoteTransform2D:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.100000024, 0.8333333, 1.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AnimatedSprite2DDoor:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("AnimatedSprite2DDoor:animation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"Opening"]
+}
+
+[sub_resource type="Animation" id="Animation_qhmuh"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("RemoteTransform2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("RemoteTransform2D:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AnimatedSprite2DDoor:animation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"Opening"]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("AnimatedSprite2DDoor:frame")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [5]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_y6t8d"]
+_data = {
+&"OpenDoor": SubResource("Animation_hb1xk"),
+&"RESET": SubResource("Animation_qhmuh")
+}
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_7wvpd"]
 atlas = ExtResource("1_lp70j")
 region = Rect2(160, 24, 28, 40)
@@ -74,7 +183,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"Opening",
-"speed": 5.0
+"speed": 7.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qhmuh"]
@@ -83,15 +192,25 @@ size = Vector2(26, 39)
 [node name="Player_Door_Spawn" type="Marker2D" unique_id=2041129026]
 script = ExtResource("1_qhmuh")
 
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1573043762]
+libraries/ = SubResource("AnimationLibrary_y6t8d")
+
 [node name="AnimatedSprite2DDoor" type="AnimatedSprite2D" parent="." unique_id=573998756]
 sprite_frames = SubResource("SpriteFrames_whhrf")
 animation = &"Opening"
+frame = 5
 script = ExtResource("3_j3lpk")
 
 [node name="Area2D" type="Area2D" parent="." unique_id=168645816 groups=["Player"]]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=55860616]
+visible = false
 position = Vector2(0, 0.5)
 shape = SubResource("RectangleShape2D_qhmuh")
 
+[node name="RemoteTransform2D" type="RemoteTransform2D" parent="." unique_id=2005727948]
+
+[node name="DummyMarker" type="Marker2D" parent="RemoteTransform2D" unique_id=1893251267]
+
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
 [connection signal="area_exited" from="Area2D" to="." method="_on_area_2d_area_exited"]

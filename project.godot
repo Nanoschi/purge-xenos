@@ -17,8 +17,9 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-MapHelpers="*uid://bvwx7ueuw6kbv"
 SignalBus="*uid://fwb8n14j8d6s"
+MapHelpers="*uid://bvwx7ueuw6kbv"
+CursorManager="*uid://brlpotssmlyo8"
 
 [display]
 

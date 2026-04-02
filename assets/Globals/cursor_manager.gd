@@ -1,7 +1,6 @@
 extends Node
-class_name CursorManager
 
-@export var map_interface: MapInterface
+@export var base_map: BaseMap
 @export var battle_driver: BattleDriver
 
 @onready var tile_highlight = $TileHighlight
@@ -25,19 +24,26 @@ func _ready() -> void:
 	dot_material_reachable.set_shader_parameter("color", DOT_COLOR_REACHABLE)
 	dot_material_unreachable.shader = PATH_HIGHLIGHT_SHADER
 	dot_material_unreachable.set_shader_parameter("color", DOT_COLOR_UNREACHABLE)
-	
 
 func _process(_delta: float) -> void:
-	var mouse_pos = map_interface.map_floor.get_local_mouse_position()
+	if base_map == null:
+		# Make sure the base_map registers itself to the cursor manager
+		return
+		
+	var mouse_pos = base_map.map_floor.get_local_mouse_position()
 	var cell_pos = MapHelpers.pixel_to_cell(mouse_pos)
 	
-	if map_interface.is_tile_walk_selectable(cell_pos):
+	if base_map.is_tile_walk_selectable(cell_pos):
 		tile_highlight.visible = true
 		tile_highlight.position = MapHelpers.cell_to_pixel(cell_pos)
 	else:
 		tile_highlight.visible = false
 		
 func _unhandled_input(event: InputEvent) -> void:
+	if battle_driver == null:
+		# Make sure the battle_driver registers itself to the cursor manager
+		return
+		
 	if battle_driver.current_character == null:
 		return
 	if battle_driver.current_character.selected_action == null:
@@ -57,9 +63,9 @@ func display_path_dots(event: InputEvent):
 	if battle_driver.current_character.selected_action.movement == 0:
 		_update_path_dots([])	
 	elif event is InputEventMouse:
-		var mouse_pos = map_interface.map_floor.get_local_mouse_position()
+		var mouse_pos = base_map.map_floor.get_local_mouse_position()
 		var cell = MapHelpers.pixel_to_cell(mouse_pos)
-		if map_interface.is_tile_walk_selectable(cell):
+		if base_map.is_tile_walk_selectable(cell):
 			if not battle_driver.current_character.is_moving:
 				if not _is_cell_targeted:
 					_is_cell_targeted = true
@@ -105,7 +111,7 @@ func display_attack_highlight(event: InputEvent):
 	if battle_driver.current_character.selected_action.damage == 0:
 		return
 		
-	var mouse_pos = map_interface.map_floor.get_local_mouse_position()
+	var mouse_pos = base_map.map_floor.get_local_mouse_position()
 	var target_cell = MapHelpers.pixel_to_cell(mouse_pos)
 	
 	var on_valid_targ = false

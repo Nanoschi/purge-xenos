@@ -1,8 +1,9 @@
 [gd_scene format=4 uid="uid://b3qc3esm2jrpm"]
 
-[ext_resource type="Script" uid="uid://e8np4xf3woya" path="res://assets/Maps/Base/map_interface.gd" id="1_wbupc"]
+[ext_resource type="Script" uid="uid://e8np4xf3woya" path="res://assets/Maps/Base/base_map.gd" id="1_wbupc"]
 [ext_resource type="TileSet" uid="uid://bhdi5o8sqew5x" path="res://assets/Maps/Tiles/map_tileset.tres" id="3_oj8sm"]
 [ext_resource type="Script" uid="uid://bj4nk162jolp4" path="res://assets/Maps/Base/map_floor.gd" id="3_wbupc"]
+[ext_resource type="PackedScene" uid="uid://dlaasall4nt2p" path="res://assets/Maps/SpawnPoints/player_door_spawn.tscn" id="5_7wvpd"]
 [ext_resource type="Script" uid="uid://cqse63usqetho" path="res://assets/Maps/Base/pathfind.gd" id="5_oj8sm"]
 
 [node name="BaseMap" type="Node2D" unique_id=1207446625 node_paths=PackedStringArray("pathfind")]
@@ -25,3 +26,7 @@ script = ExtResource("5_oj8sm")
 map_floor = NodePath("../Floor")
 map_walls = NodePath("../Walls")
 map_interior = NodePath("../Interior")
+
+[node name="Player_Door_Spawn" parent="." unique_id=2041129026 node_paths=PackedStringArray("base_map") instance=ExtResource("5_7wvpd")]
+position = Vector2(14, 172)
+base_map = NodePath("..")

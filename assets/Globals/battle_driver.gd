@@ -19,6 +19,9 @@ var is_battle_running = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# sets the current battle_driver (self) at the global cursor manager
+	CursorManager.battle_driver = self
+	
 	match current_group_type:
 		GroupTypes.PLAYERS: 
 			current_group = Players
@@ -27,11 +30,19 @@ func _ready() -> void:
 		_: push_error("Unkown type")
 	
 	SignalBus.battle_started.connect(start_battle)
+	SignalBus.on_player_spawned.connect(on_player_spawned)
+	SignalBus.on_enemy_spawned.connect(on_enemy_spawned)
+
+func on_player_spawned(player : Player, at_cell : Vector2i):
+	Players.append(player)
+
+func on_enemy_spawned(enemy : BaseCharacter, at_cell : Vector2i):
+	Enemies.append(enemy)
 	
 func start_battle() -> void:
 	current_character = Players[current_character_idx]
 	current_group = Players
-	SignalBus.on_player_begin_turn.emit(current_character)
+	SignalBus.on_character_begin_turn.emit(current_character)
 	run_turn()
 			
 func next_turn():
@@ -51,7 +62,7 @@ func next_turn():
 	current_character.action_finished.disconnect(_on_action_finished)
 	current_character = current_group[current_character_idx]
 	if current_group_type == GroupTypes.PLAYERS:
-		SignalBus.on_player_begin_turn.emit(current_character)
+		SignalBus.on_character_begin_turn.emit(current_character)
 
 	run_turn()
 	

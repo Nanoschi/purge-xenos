@@ -3,8 +3,9 @@
 [ext_resource type="Script" uid="uid://lhjm5axl0irt" path="res://assets/Characters/Base/Players/player.gd" id="1_4xsnp"]
 [ext_resource type="PackedScene" uid="uid://d0d3wfy2eueti" path="res://assets/Characters/Base/BaseCharacter.tscn" id="1_h8fw5"]
 
-[node name="Player" unique_id=1271547261 instance=ExtResource("1_h8fw5")]
+[node name="Player" unique_id=1271547261 groups=["Players_Group"] instance=ExtResource("1_h8fw5")]
 script = ExtResource("1_4xsnp")
 current_cell = Vector2i(5, 5)
 
 [node name="Camera2D" type="Camera2D" parent="." index="2" unique_id=1952747274]
+zoom = Vector2(2, 2)
