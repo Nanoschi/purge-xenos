@@ -15,26 +15,20 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Control" type="Control" parent="VertAlign" unique_id=1774521087]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
 [node name="MenuPanel" type="Panel" parent="VertAlign" unique_id=1880548480]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_sc1dx")
 
-[node name="BtnWalk" type="Button" parent="VertAlign/MenuPanel" unique_id=37727695]
+[node name="ActionButtons" type="HBoxContainer" parent="VertAlign/MenuPanel" unique_id=487786831]
 layout_mode = 0
-offset_left = 7.0
-offset_top = 6.0
-offset_right = 54.0
-offset_bottom = 37.0
-text = "Walk"
-
-[node name="BtnAttack" type="Button" parent="VertAlign/MenuPanel" unique_id=93575028]
-layout_mode = 0
-offset_left = 66.0
-offset_top = 6.0
-offset_right = 124.0
-offset_bottom = 37.0
-text = "Attack"
+offset_right = 40.0
+offset_bottom = 40.0
 
 [node name="LabelActionCount" type="Label" parent="VertAlign/MenuPanel" unique_id=193650545]
 layout_mode = 0
@@ -42,6 +36,3 @@ offset_left = 156.0
 offset_top = 11.0
 offset_right = 196.0
 offset_bottom = 34.0
-
-[connection signal="pressed" from="VertAlign/MenuPanel/BtnWalk" to="." method="_on_btn_walk_pressed"]
-[connection signal="pressed" from="VertAlign/MenuPanel/BtnAttack" to="." method="_on_btn_attack_pressed"]

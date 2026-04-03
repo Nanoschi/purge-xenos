@@ -3,10 +3,10 @@
 [ext_resource type="Script" uid="uid://e8np4xf3woya" path="res://assets/Maps/Base/base_map.gd" id="1_wbupc"]
 [ext_resource type="TileSet" uid="uid://bhdi5o8sqew5x" path="res://assets/Maps/Tiles/map_tileset.tres" id="3_oj8sm"]
 [ext_resource type="Script" uid="uid://bj4nk162jolp4" path="res://assets/Maps/Base/map_floor.gd" id="3_wbupc"]
-[ext_resource type="PackedScene" uid="uid://dlaasall4nt2p" path="res://assets/Maps/SpawnPoints/player_door_spawn.tscn" id="5_7wvpd"]
 [ext_resource type="Script" uid="uid://cqse63usqetho" path="res://assets/Maps/Base/pathfind.gd" id="5_oj8sm"]
 [ext_resource type="PackedScene" uid="uid://c6x1bjkupvx15" path="res://assets/Maps/SpawnPoints/robot_spawn_point.tscn" id="6_7wvpd"]
 [ext_resource type="Script" uid="uid://srvs03s27m3j" path="res://assets/Maps/Base/spawnpoints.gd" id="6_v37n7"]
+[ext_resource type="PackedScene" uid="uid://3gmr8oeccm2s" path="res://assets/Maps/SpawnPoints/player_door_spawn.tscn" id="8_pgybo"]
 
 [node name="BaseMap" type="Node2D" unique_id=1207446625 node_paths=PackedStringArray("pathfind")]
 script = ExtResource("1_wbupc")
@@ -42,6 +42,6 @@ position = Vector2(176, 144)
 gizmo_extents = 20.0
 base_map = NodePath("../..")
 
-[node name="PlayerDoorSpawn" parent="Spawnpoints" unique_id=2041129026 node_paths=PackedStringArray("base_map") instance=ExtResource("5_7wvpd")]
-position = Vector2(14, 172)
+[node name="PlayerDoorSpawn2" parent="Spawnpoints" unique_id=1989021728 node_paths=PackedStringArray("base_map") instance=ExtResource("8_pgybo")]
+position = Vector2(16, 144)
 base_map = NodePath("../..")

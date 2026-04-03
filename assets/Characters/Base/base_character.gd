@@ -55,6 +55,10 @@ func start_turn():
 func execute_action(target: Vector2i):
 	pass
 	
+func move_delta(delta_cells : Vector2i):
+	var target = Vector2i(current_cell + delta_cells)
+	move([current_cell, target])	
+	
 func execute_move(target: Vector2i):
 	if is_moving:
 		return
@@ -78,8 +82,11 @@ func execute_move(target: Vector2i):
 		is_moving = false
 		return
 	
+	tween_movement(path)
+
+func tween_movement(path : Array[Vector2i]):
+
 	calc_direction(path[0], path[1])
-	
 	var move_tween: Tween = create_tween()
 	
 	move_tween.step_finished.connect(func(idx : int):
@@ -98,12 +105,7 @@ func execute_move(target: Vector2i):
 	
 	move_tween.tween_callback(func(): is_moving = false)
 	move_tween.tween_callback(func(): action_finished.emit())
-	
-	current_cell = target
-	
-func move_delta(delta_cells : Vector2i):
-	var cell = Vector2i(current_cell + delta_cells)
-	execute_move(cell)
+	move_tween.tween_callback(func(): current_cell = path[-1])
 
 func update_current_cell():
 	current_cell = MapHelpers.cell_to_pixel(position)
@@ -113,32 +115,15 @@ func move(path : Array[Vector2i]):
 	if is_moving:
 		return
 	
+	print(path)
+	
 	is_moving = true
 	if path.size() <= 1:
 		is_moving = false
 		return
-		
-	calc_direction(path[0], path[1])
-	
-	var move_tween: Tween = create_tween()
-	
-	move_tween.step_finished.connect(func(idx : int):
-		if idx >= path.size():
-			return
-		if idx < path.size() - 2:
-			calc_direction(path[idx + 1], path[idx + 2])	
-		else:
-			calc_direction(path[idx - 1], path[idx])	
-		)
 			
-	for step_index in range(1, path.size()):
-		var step = Vector2i(path[step_index])
-		var pixel_step = MapHelpers.cell_to_pixel(step)	
-		move_tween.tween_property(self, "position", pixel_step, 0.2)
+	tween_movement(path)
 	
-	move_tween.tween_callback(func(): is_moving = false)
-	move_tween.tween_callback(func(): action_finished.emit())
-		
 func execute_attack(target: Vector2i):
 	print("Attacked %s" % target)
 	action_finished.emit()

@@ -4,6 +4,7 @@ extends CanvasLayer
 var active_player : BaseCharacter
 
 @onready var label_action_count = $VertAlign/MenuPanel/LabelActionCount
+@onready var container_action_buttons = $"VertAlign/MenuPanel/ActionButtons"
 
 func _ready() -> void:
 	SignalBus.on_character_begin_turn.connect(on_character_begin_turn)
@@ -16,13 +17,18 @@ func _process(_delta: float) -> void:
 
 func on_character_begin_turn(player : BaseCharacter) -> void:
 	active_player = player
-
-func _on_btn_walk_pressed() -> void:
+	for button in container_action_buttons.get_children():
+		button.queue_free()
+		
+	for action_type in active_player.combat_actions:
+		var action = active_player.combat_actions[action_type]
+		var button = Button.new()
+		container_action_buttons.add_child(button)
+		button.text = action.display_name
+		button.pressed.connect(_on_action_button_walk_pressed.bind(action_type))
+		
+		
+func _on_action_button_walk_pressed(type: CombatAction.ActionType) -> void:
 	if active_player == null:
 		return
-	active_player.select_action(CombatAction.ActionType.MOVE)
-
-func _on_btn_attack_pressed() -> void:
-	if active_player == null:
-		return
-	active_player.select_action(CombatAction.ActionType.PEW_PEW)
+	active_player.select_action(type)

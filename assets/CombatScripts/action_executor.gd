@@ -8,7 +8,9 @@ func _init(actions : Array[CombatAction]):
 	
 func excecute(owner : BaseCharacter):
 	for action in _actions:
-		owner.execute_move(action.path.slice(1, action.movement)[-1])
+		var sliced_path = action.path.slice(1, action.movement)
+		if sliced_path.size() > 0 :
+			owner.execute_move(sliced_path[-1])
 		#owner.heal(action.heal, action.healTarget)
 		#owner.deal_damage(action.damage, action.DamageTarget)
 		#etc...

@@ -24,6 +24,9 @@ static func create(base_map : BaseMap, max_action_count : int, current_cell : Ve
 	robot.base_map = base_map
 	robot.max_action_count = max_action_count
 	robot.current_cell = current_cell
+	var move_dict = CombatAction.create_move_action(5)
+	#Use dict.merge() when multiple actions are required
+	robot.combat_actions = move_dict
 	return robot
 
 func start_turn():
