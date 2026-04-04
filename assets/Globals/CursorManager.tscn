@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://dwwt8xxhmunnb" path="res://assets/Globals/cursor_manager.gd" id="1_dfugi"]
 [ext_resource type="PackedScene" uid="uid://dqh4254o3w1d6" path="res://assets/Maps/TileHighlight.tscn" id="2_c415x"]
 [ext_resource type="PackedScene" uid="uid://ddbhnpa6kr834" path="res://assets/Maps/AttackHighlight.tscn" id="3_7d51c"]
-[ext_resource type="Texture2D" uid="uid://dmkvlnityogwd" path="res://assets/Characters/Tiles/player_blue_armor_idle_no_wpn.png" id="4_c415x"]
 
 [node name="CursorManager" type="Node" unique_id=443503343]
 script = ExtResource("1_dfugi")
@@ -16,7 +15,3 @@ position = Vector2(0, -21)
 
 [node name="AttackHighlight" parent="." unique_id=495309528 instance=ExtResource("3_7d51c")]
 visible = false
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1066363678]
-position = Vector2(48, 107)
-texture = ExtResource("4_c415x")

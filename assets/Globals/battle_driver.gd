@@ -19,8 +19,9 @@ var is_battle_running = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# sets the current battle_driver (self) at the global cursor manager
-	CursorManager.battle_driver = self
+	# sets the current battle_driver (self) at the cursor manager
+	SignalBus.main_init_finished.connect(func(): 
+		SignalBus.battle_driver_initialized.emit(self))
 	
 	SignalBus.on_hud_player_end_turn.connect(on_hud_player_end_turn)
 	

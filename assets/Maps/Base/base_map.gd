@@ -9,8 +9,9 @@ var pathfind: Pathfind
 @onready var map_interior: Node2D = $Interior
 
 func _ready():
-	# sets the current map (self) at the global cursor manager
-	CursorManager.base_map = self
+	# sets the current map (self) at the cursor manager
+	SignalBus.main_init_finished.connect(func(): 
+		SignalBus.map_initialized.emit(self))
 	SignalBus.on_all_characters_spawned.connect(on_all_characters_spawned)
 	
 func is_tile_walk_selectable(pos: Vector2i) -> bool:
@@ -32,6 +33,5 @@ func on_all_characters_spawned(players : Array[Player], enemies : Array[BaseChar
 	for player in players:
 		player.reparent(self, true)
 		player.set_owner(self)	
-	
 
 	

@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://0gcuyn2hbk0q"]
 
+[ext_resource type="PackedScene" uid="uid://brlpotssmlyo8" path="res://assets/Globals/CursorManager.tscn" id="2_elpgs"]
 [ext_resource type="PackedScene" uid="uid://ykod7seiqehp" path="res://assets/World.tscn" id="2_uu6xs"]
 [ext_resource type="PackedScene" uid="uid://l3ahdws078cw" path="res://assets/UI/HUD/HUD.tscn" id="13_c6i3y"]
 
@@ -11,6 +12,7 @@ script/source = "extends Node2D
 func _ready() -> void:
 	# Make sure rand() functions return the same results everytime we start the game.
 	seed(123)
+	SignalBus.main_init_finished.emit()
 		
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -20,7 +22,27 @@ func _process(delta: float) -> void:
 [node name="Main" type="Node2D" unique_id=1619049666]
 script = SubResource("GDScript_glv2v")
 
-[node name="World" parent="." unique_id=2008988094 instance=ExtResource("2_uu6xs")]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=141233911]
 
-[node name="HUD" parent="." unique_id=488963275 instance=ExtResource("13_c6i3y")]
-unique_name_in_owner = true
+[node name="SubViewportContainer" type="SubViewportContainer" parent="CanvasLayer" unique_id=1836136802]
+custom_minimum_size = Vector2(100, 100)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="CanvasLayer/SubViewportContainer" unique_id=1173174939]
+disable_3d = true
+handle_input_locally = false
+canvas_item_default_texture_filter = 0
+size = Vector2i(1600, 850)
+render_target_update_mode = 4
+
+[node name="CursorManager" parent="CanvasLayer/SubViewportContainer/SubViewport" unique_id=443503343 instance=ExtResource("2_elpgs")]
+
+[node name="World" parent="CanvasLayer/SubViewportContainer/SubViewport" unique_id=2008988094 instance=ExtResource("2_uu6xs")]
+
+[node name="HUD" parent="." unique_id=1730960279 instance=ExtResource("13_c6i3y")]

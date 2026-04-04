@@ -24,6 +24,9 @@ func _ready() -> void:
 	dot_material_reachable.set_shader_parameter("color", DOT_COLOR_REACHABLE)
 	dot_material_unreachable.shader = PATH_HIGHLIGHT_SHADER
 	dot_material_unreachable.set_shader_parameter("color", DOT_COLOR_UNREACHABLE)
+	
+	SignalBus.map_initialized.connect(func(map): base_map = map)
+	SignalBus.battle_driver_initialized.connect(func(driver): battle_driver = driver)
 
 func _process(_delta: float) -> void:
 	if base_map == null:
@@ -39,18 +42,21 @@ func _process(_delta: float) -> void:
 	else:
 		tile_highlight.visible = false
 		
-func _unhandled_input(event: InputEvent) -> void:
-	if battle_driver == null:
-		# Make sure the battle_driver registers itself to the cursor manager
-		return
 		
+func _unhandled_input(event: InputEvent) -> void:
+	#assert(battle_driver != null)
+	
+	if battle_driver == null:
+		return
+
 	if battle_driver.current_character == null:
 		return
 	if battle_driver.current_character.selected_action == null:
 		return
 	
 	_display_selected_action(event)
-			
+	print("unhandled")
+		
 func _display_selected_action(event: InputEvent):
 	if battle_driver.current_character.action_count > 0:
 		display_path_dots(event)
