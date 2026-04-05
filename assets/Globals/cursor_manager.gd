@@ -79,16 +79,11 @@ func _display_selected_action(event: InputEvent):
 						_update_path_dots(id, [])
 
 func _on_enemy_selected_action(enemy : BaseCharacter, action : CombatAction):
-	display_selected_action_of_enemy(enemy, action)
-				
-func display_selected_action_of_enemy(enemy : BaseCharacter, action : CombatAction):
-	
 	print("Show action of enemy: %s" % str(action.display_name))
 	#display_enemy_path_dots(action.path)
 	var id = enemy.get_instance_id()
 	_update_path_dots(id, action.path, action.movement)
-	#display_attack_highlight(event)
-
+	
 func display_enemy_path_dots(path : Array[Vector2i]):
 	pass	
 
