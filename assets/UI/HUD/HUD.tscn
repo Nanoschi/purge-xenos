@@ -5,7 +5,15 @@
 [ext_resource type="Texture2D" uid="uid://0ibshv27kb18" path="res://assets/CombatScripts/Icons/move.png" id="2_ymj7e"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sc1dx"]
-bg_color = Color(0, 0, 0, 0.15294118)
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bx2xk"]
+bg_color = Color(0.60038817, 0.60038817, 0.60038817, 0)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_blend = true
 
 [node name="HUD" type="CanvasLayer" unique_id=1730960279]
 script = ExtResource("1_0muis")
@@ -26,30 +34,30 @@ mouse_filter = 2
 [node name="MenuPanel" type="Panel" parent="VertAlign" unique_id=1880548480]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_sc1dx")
 
-[node name="ActionButtons" type="HBoxContainer" parent="VertAlign/MenuPanel" unique_id=487786831]
+[node name="PanelContainer" type="PanelContainer" parent="VertAlign/MenuPanel" unique_id=252973256]
+layout_mode = 0
+offset_left = 457.0
+offset_right = 970.0
+offset_bottom = 70.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_bx2xk")
+
+[node name="ActionButtons" type="HBoxContainer" parent="VertAlign/MenuPanel/PanelContainer" unique_id=487786831]
 custom_minimum_size = Vector2(160, 64)
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 0.1
-anchor_bottom = 1.0
-offset_left = 25.0
-offset_top = 21.0
-offset_right = 25.0
-offset_bottom = -15.0
+layout_mode = 2
 mouse_filter = 2
 
 [node name="LabelActionCount" type="Label" parent="VertAlign/MenuPanel" unique_id=193650545]
 layout_mode = 0
-offset_left = 243.0
-offset_top = 6.0
-offset_right = 448.0
-offset_bottom = 29.0
+offset_left = 27.0
+offset_top = 3.0
+offset_right = 232.0
+offset_bottom = 26.0
 text = "Remaining action points: x"
 
 [node name="DummyTestButton" type="Button" parent="VertAlign/MenuPanel" unique_id=1036344981]
-visible = false
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 0
 offset_left = 1354.0
@@ -59,6 +67,7 @@ offset_bottom = 79.0
 size_flags_horizontal = 4
 theme = ExtResource("2_bx2xk")
 theme_override_icons/icon = ExtResource("2_ymj7e")
+toggle_mode = true
 expand_icon = true
 
 [node name="MarginContainer" type="MarginContainer" parent="VertAlign/MenuPanel" unique_id=2127954192]

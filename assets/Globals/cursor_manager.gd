@@ -77,8 +77,6 @@ func _display_selected_action(event: InputEvent):
 					battle_driver.current_character.execute_action(target_cell)
 					if battle_driver.current_character.is_moving:
 						_update_path_dots(id, [])
-				#if event.button_mask & MouseButton.MOUSE_BUTTON_LEFT:
-					#battle_driver.current_character.execute_action(target_cell)
 
 func _on_enemy_selected_action(enemy : BaseCharacter, action : CombatAction):
 	display_selected_action_of_enemy(enemy, action)
@@ -144,17 +142,17 @@ func display_attack_highlight(target_cell : Vector2i):
 	if battle_driver.current_character.selected_action.damage == 0:
 		return
 		
-	var on_valid_targ = false
+	var on_valid_target = false
 	if EnumHelpers.has_flag(
 		battle_driver.current_character.selected_action.valid_target_flags, 
 		CombatAction.ValidTargetFlags.OPPONENTS):
 			if battle_driver.current_character.is_player:
 				for enemy in battle_driver.Enemies:
 					if enemy.current_cell == target_cell:
-						on_valid_targ = true
+						on_valid_target = true
 						
 	#if event.button_mask & MouseButton.MOUSE_BUTTON_LEFT and on_valid_targ:
 		#battle_driver.current_character.execute_action(target_cell)
 						
 	attack_highlight.position = MapHelpers.cell_to_pixel(target_cell)
-	attack_highlight.visible = on_valid_targ
+	attack_highlight.visible = on_valid_target

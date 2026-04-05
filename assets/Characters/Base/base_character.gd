@@ -134,3 +134,6 @@ func calc_direction(from : Vector2i, to: Vector2i):
 
 func select_action(type: CombatAction.ActionType):
 	selected_action = combat_actions.get(type)
+
+func deselect_action():
+	selected_action = null

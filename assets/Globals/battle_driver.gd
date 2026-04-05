@@ -11,7 +11,7 @@ enum GroupTypes {
 
 signal battle_won(who : GroupTypes)
 
-var current_group_type : GroupTypes = GroupTypes.ENEMIES
+var current_group_type : GroupTypes = GroupTypes.PLAYERS
 var current_group : Array[BaseCharacter]
 var current_character : BaseCharacter
 var current_character_idx = 0

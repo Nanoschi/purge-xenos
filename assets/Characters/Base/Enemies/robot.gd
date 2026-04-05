@@ -25,6 +25,30 @@ static func create(base_map : BaseMap, max_action_count : int, current_cell : Ve
 	return robot
 
 func _on_pre_begin_turn():
+	pass
+	#print("Enemy pre_begin_turn")
+	#var idx : int = randi_range(0, combat_actions.size() - 1)
+	#
+	## Magic AI which provide fully fleshed out actions
+	#selected_action = combat_actions[combat_actions.keys()[idx]]
+	#var player : BaseCharacter = $"../Player"
+	#var path = base_map.get_astar_path(current_cell, player.current_cell, true)
+	#
+	#print(path)
+	#if path.size() > selected_action.movement + 1:
+		#path = path.slice(0, selected_action.movement + 1) 
+		#print(path)
+	#selected_action.path = path
+	#
+	#SignalBus.enemy_selected_action.emit(self, selected_action)
+	
+func start_turn():
+	action_count = max_action_count
+
+func execute_action(target: Vector2i):
+	action_count -= 1
+	
+	
 	print("Enemy pre_begin_turn")
 	var idx : int = randi_range(0, combat_actions.size() - 1)
 	
@@ -40,12 +64,6 @@ func _on_pre_begin_turn():
 	selected_action.path = path
 	
 	SignalBus.enemy_selected_action.emit(self, selected_action)
-	
-func start_turn():
-	action_count = max_action_count
-
-func execute_action(target: Vector2i):
-	action_count -= 1
 	
 	var executor = ActionExecutor.new([selected_action])
 	executor.excecute(self)
