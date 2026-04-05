@@ -23,5 +23,16 @@ func get_astar_path(from : Vector2i, to : Vector2i, partial_path : bool = false)
 	pathfind.astar_grid.set_point_solid(from, true)
 	return path
 
-
+## Returns the rect of the floor in pixel world coordinates.
+func get_used_rect() -> Rect2:
+	var used_rect : Rect2i = map_floor.get_used_rect()
+	# Get the top-left position in world coordinates
+	var world_position = map_floor.map_to_local(used_rect.position)
+	# Get the size in world coordinates (pixels)
+	var world_size = map_floor.map_to_local(used_rect.size)
+	
+	return Rect2(world_position, world_size)
+	
+	
+	
 	

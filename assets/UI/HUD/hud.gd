@@ -61,3 +61,7 @@ func _on_btn_end_turn_pressed() -> void:
 	if active_player == null:
 		return
 	SignalBus.on_hud_player_end_turn.emit(active_player)
+
+
+func _on_btn_reset_camera_pressed() -> void:
+	SignalBus.hud_camera_resetted.emit()

@@ -8,7 +8,7 @@ width = 32
 height = 32
 
 [node name="AttackHighlight" type="Node2D" unique_id=495309528]
-z_index = 1
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=732923706]
+z_index = 1
 texture = SubResource("GradientTexture2D_6ypqt")
