@@ -3,6 +3,8 @@ extends Camera2D
 # See WARNING's below for detail on custom control binding. Apart from scroll zooming, every key and mouse
 # press must be bound manually by the developer.
 
+# Original script from: https://github.com/Thomas737/godot-strategy-camera
+
 @export var allow_mouse_controls: bool = true
 @export var allow_keyboard_controls: bool = true
 
@@ -27,7 +29,7 @@ extends Camera2D
 ## If this and limit_TL set to Vector2.ZERO, no limits will be applied
 @export var limit_BR: Vector2 = Vector2.ZERO
 
-
+# Todo: Make Margins "smart". Dependend on viewport size or something.
 @export_group("Margins")
 ## Add some extra space to the left. When camera jumps, it's probably because the position is out of limits
 @export var margin_left : float = 400.0
@@ -66,9 +68,9 @@ func _on_hud_camera_resetted():
 	
 	var tween = create_tween()
 	tween.tween_property(self, "zoom", original_zoom, 0.2)
-	tween.tween_property(self, "target_zoom", original_zoom, 0.2)
-	tween.tween_property(self, "position", Vector2.ZERO, 0.2)
-	tween.tween_property(self, "offset", Vector2.ZERO, 0.2)
+	tween.parallel().tween_property(self, "target_zoom", original_zoom, 0.2)
+	tween.parallel().tween_property(self, "position", Vector2.ZERO, 0.2)
+	tween.parallel().tween_property(self, "offset", Vector2.ZERO, 0.2)
 	
 	tween.tween_callback(func(): is_resetting = false)
 	
