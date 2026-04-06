@@ -23,6 +23,7 @@ func _ready() -> void:
 	SignalBus.main_init_finished.connect(func(): 
 		SignalBus.battle_driver_initialized.emit(self))
 	
+	SignalBus.action_executed.connect(_on_action_executed)
 	SignalBus.on_hud_player_end_turn.connect(on_hud_player_end_turn)
 	
 	match current_group_type:
@@ -68,7 +69,6 @@ func next_turn():
 			
 		current_character_idx = 0
 	
-	current_character.action_finished.disconnect(_on_action_finished)
 	current_character = current_group[current_character_idx]
 	if current_group_type == GroupTypes.PLAYERS:
 		SignalBus.on_character_begin_turn.emit(current_character)
@@ -79,7 +79,6 @@ func run_turn():
 	if current_character == null:
 		print("No current character")
 		return
-	current_character.action_finished.connect(_on_action_finished)	
 	current_character.start_turn()
 		
 func on_character_died(character : BaseCharacter) -> void :
@@ -92,10 +91,19 @@ func on_character_died(character : BaseCharacter) -> void :
 	if Players.size() == 0:
 		is_battle_running = false
 		battle_won.emit(GroupTypes.ENEMIES)
+
+func _on_action_executed(character : BaseCharacter):
+	if current_character == null:
+		# In case that there is a "cut scene" like the movement after player spawn
+		# there will be no current_character, because the action wasn't driven by the battle_driver
+		return
 		
-func _on_action_finished():
-	if current_character.action_count == 0:
+	if character == current_character && current_character.action_count == 0:
+		current_character = null
 		next_turn()
 		
+		
 func on_hud_player_end_turn(player : Player):
-	next_turn()
+	if player == current_character:
+		current_character = null
+		next_turn()

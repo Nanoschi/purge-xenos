@@ -1,7 +1,7 @@
 extends Marker2D
 class_name BaseCharacter
 
-signal action_finished
+#signal action_finished
 
 
 @export var current_cell : Vector2i:
@@ -105,7 +105,7 @@ func tween_movement(path : Array[Vector2i]):
 		move_tween.tween_property(self, "position", pixel_step, 0.2)
 	
 	move_tween.tween_callback(func(): is_moving = false)
-	move_tween.tween_callback(func(): action_finished.emit())
+	move_tween.tween_callback(func(): SignalBus.action_executed.emit(self))
 	move_tween.tween_callback(func(): current_cell = path[-1])
 
 func update_current_cell():
@@ -125,7 +125,8 @@ func move(path : Array[Vector2i]):
 	
 func execute_attack(target: Vector2i):
 	print("Attacked %s" % target)
-	action_finished.emit()
+	#action_finished.emit()
+	SignalBus.action_executed.emit(self)
 
 
 func calc_direction(from : Vector2i, to: Vector2i):

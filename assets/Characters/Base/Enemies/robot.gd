@@ -70,10 +70,13 @@ func execute_action(target: Vector2i):
 	
 	if EnumHelpers.has_flag(CombatAction.ValidTargetFlags.SELF, selected_action.valid_target_flags):
 		print("Enemy has done: %s" % selected_action.display_name)
-		action_finished.emit()
+		#action_finished.emit()
+		SignalBus.action_executed.emit(self)
 	elif EnumHelpers.has_flag(CombatAction.ValidTargetFlags.OPPONENTS, selected_action.valid_target_flags):
 		print("Enemy has done: %s" % selected_action.display_name)
-		action_finished.emit()
+		#action_finished.emit()
+		SignalBus.action_executed.emit(self)
 	elif EnumHelpers.has_flag(CombatAction.ValidTargetFlags.CELL, selected_action.valid_target_flags):
-		action_finished.emit()
+		#action_finished.emit()
+		SignalBus.action_executed.emit(self)
 		print("Enemy has done: %s" % selected_action.display_name)

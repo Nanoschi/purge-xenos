@@ -12,6 +12,6 @@ signal battle_driver_initialized(battle_driver: BattleDriver)
 signal main_init_finished
 signal enemy_selected_action(enemy : BaseCharacter, action: CombatAction)
 signal pre_begin_turn
-signal player_action_executed(player_idx : int)
+signal action_executed(character : BaseCharacter)
 signal hud_camera_resetted
 @warning_ignore_restore("unused_signal")

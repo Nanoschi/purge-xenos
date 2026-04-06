@@ -21,6 +21,7 @@ var dot_material_unreachable = ShaderMaterial.new()
 # Key: id of Character. Value: Array of Node2D
 var path_dots_dict : Dictionary[int, Array] = {}
 
+
 func _ready() -> void:
 	dot_material_reachable.shader = PATH_HIGHLIGHT_SHADER
 	dot_material_reachable.set_shader_parameter("color", DOT_COLOR_REACHABLE)

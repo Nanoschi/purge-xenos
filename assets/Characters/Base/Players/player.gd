@@ -46,4 +46,4 @@ func execute_action(target: Vector2i):
 	if selected_action.damage > 0:
 		execute_attack(target)
 		
-	SignalBus.player_action_executed.emit(player_index)
+	SignalBus.action_executed.emit(self)
