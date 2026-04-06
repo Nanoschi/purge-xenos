@@ -8,8 +8,12 @@ extends Resource
 @export var heal : int = 0
 @export var movement : int = 0
 @export var path : Array[Vector2i] = []
+@export var targeted_cells : Array[Vector2i] = []
 @export var cost : int = 0
 @export var icon : Texture2D
+## if true, the action can be discarded in turn stage. AoE effects should be locked.
+@export var action_is_locked : bool
+
 @export_flags("SELF:1", "GROUP_MEMBERS:2", "OPPONENTS:4", "CELL:8") var valid_target_flags: int = 0
 
 const MOVE_ACTION_STR : String = "res://assets/CombatScripts/move.tres"

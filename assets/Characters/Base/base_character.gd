@@ -59,7 +59,12 @@ func move_delta(delta_cells : Vector2i):
 	var target = Vector2i(current_cell + delta_cells)
 	var path = base_map.get_astar_path(current_cell, target)
 	move(path)	
-	
+
+func execute_deal_damage(targeted_cells : Array[Vector2i], damage : int):
+	if damage == 0:
+		return
+	print("Dealt damage to %s, amount: %d" % [str(targeted_cells), damage ])
+
 func execute_move(target: Vector2i):
 	if is_moving:
 		return

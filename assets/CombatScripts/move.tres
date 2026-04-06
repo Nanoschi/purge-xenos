@@ -9,5 +9,6 @@ display_name = "Move"
 description = "Moves the character"
 movement = 5
 icon = ExtResource("1_t7i3q")
+adjusts_targets = true
 valid_target_flags = 8
 metadata/_custom_type_script = "uid://bcseivrinftr5"

@@ -19,28 +19,36 @@ static func create(base_map : BaseMap, max_action_count : int, current_cell : Ve
 	robot.base_map = base_map
 	robot.max_action_count = max_action_count
 	robot.current_cell = current_cell
-	var move_dict = CombatAction.create_move_action(5)
-	#Use dict.merge() when multiple actions are required
-	robot.combat_actions = move_dict
+	
+	var actions : Dictionary[CombatAction.ActionType, CombatAction] = {}
+	var move = CombatAction.create_move_action(5)
+	var pewpew = CombatAction.create_pewpew_action()
+	actions.merge(move)
+	actions.merge(pewpew)
+	
+	robot.combat_actions = actions
 	return robot
 
+func ai_select_action() -> CombatAction:
+	var idx : int = randi_range(0, combat_actions.size() - 1)
+	
+	# Magic AI which provide fully fleshed out actions
+	var action = combat_actions[combat_actions.keys()[idx]]
+	var player : BaseCharacter = $"../Player"
+	action.targeted_cells = [player.current_cell] as Array[Vector2i]
+	
+	var path = base_map.get_astar_path(current_cell, player.current_cell, true)
+	if path.size() > action.movement + 1:
+		path = path.slice(0, action.movement + 1) 
+		print(path)
+	action.path = path
+
+
+	return action
+
 func _on_pre_begin_turn():
-	pass
-	#print("Enemy pre_begin_turn")
-	#var idx : int = randi_range(0, combat_actions.size() - 1)
-	#
-	## Magic AI which provide fully fleshed out actions
-	#selected_action = combat_actions[combat_actions.keys()[idx]]
-	#var player : BaseCharacter = $"../Player"
-	#var path = base_map.get_astar_path(current_cell, player.current_cell, true)
-	#
-	#print(path)
-	#if path.size() > selected_action.movement + 1:
-		#path = path.slice(0, selected_action.movement + 1) 
-		#print(path)
-	#selected_action.path = path
-	#
-	#SignalBus.enemy_selected_action.emit(self, selected_action)
+	selected_action = ai_select_action()
+	SignalBus.enemy_selected_action.emit(self, selected_action)
 	
 func start_turn():
 	action_count = max_action_count
@@ -48,20 +56,7 @@ func start_turn():
 func execute_action(target: Vector2i):
 	action_count -= 1
 	
-	
-	print("Enemy pre_begin_turn")
-	var idx : int = randi_range(0, combat_actions.size() - 1)
-	
-	# Magic AI which provide fully fleshed out actions
-	selected_action = combat_actions[combat_actions.keys()[idx]]
-	var player : BaseCharacter = $"../Player"
-	var path = base_map.get_astar_path(current_cell, player.current_cell, true)
-	
-	print(path)
-	if path.size() > selected_action.movement + 1:
-		path = path.slice(0, selected_action.movement + 1) 
-		print(path)
-	selected_action.path = path
+	selected_action = ai_select_action()
 	
 	SignalBus.enemy_selected_action.emit(self, selected_action)
 	
@@ -70,13 +65,10 @@ func execute_action(target: Vector2i):
 	
 	if EnumHelpers.has_flag(CombatAction.ValidTargetFlags.SELF, selected_action.valid_target_flags):
 		print("Enemy has done: %s" % selected_action.display_name)
-		#action_finished.emit()
 		SignalBus.action_executed.emit(self)
 	elif EnumHelpers.has_flag(CombatAction.ValidTargetFlags.OPPONENTS, selected_action.valid_target_flags):
 		print("Enemy has done: %s" % selected_action.display_name)
-		#action_finished.emit()
 		SignalBus.action_executed.emit(self)
 	elif EnumHelpers.has_flag(CombatAction.ValidTargetFlags.CELL, selected_action.valid_target_flags):
-		#action_finished.emit()
 		SignalBus.action_executed.emit(self)
 		print("Enemy has done: %s" % selected_action.display_name)

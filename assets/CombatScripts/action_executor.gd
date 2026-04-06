@@ -11,6 +11,7 @@ func excecute(owner : BaseCharacter):
 		var sliced_path = action.path.slice(1, action.movement)
 		if sliced_path.size() > 0 :
 			owner.execute_move(sliced_path[-1])
+		owner.execute_deal_damage(action.targeted_cells, action.damage)
 		#owner.heal(action.heal, action.healTarget)
 		#owner.deal_damage(action.damage, action.DamageTarget)
 		#etc...

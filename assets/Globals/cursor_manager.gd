@@ -5,7 +5,7 @@ extends Node
 
 @onready var tile_highlight = $TileHighlight
 @onready var path_dots = $PathDots
-@onready var attack_highlight = $AttackHighlight
+@onready var attack_dots = $AttackDots
 
 var _is_cell_targeted = false
 var _current_targeted_cell: Vector2i
@@ -13,14 +13,17 @@ var _current_targeted_cell: Vector2i
 const PATH_HIGHLIGHT_SCENE = preload("res://assets/Maps/PathHighlight.tscn")
 const PATH_HIGHLIGHT_SHADER = preload("res://assets/Materials/path_highlight.gdshader")
 
+const ATTACK_HIGHLIGHT_SCENE = preload("res://assets/Maps/AttackHighlight.tscn")
+
 const DOT_COLOR_REACHABLE = Vector3(1, 1, 0)
 const DOT_COLOR_UNREACHABLE = Vector3(1, 0, 0)
 
 var dot_material_reachable = ShaderMaterial.new()
 var dot_material_unreachable = ShaderMaterial.new()
-# Key: id of Character. Value: Array of Node2D
-var path_dots_dict : Dictionary[int, Array] = {}
-
+# Key: Character. Value: Array of Node2D
+var path_dots_dict : Dictionary[BaseCharacter, Array] = {}
+# Key: Character. Value: Array of Node2D
+var attack_dots_dict : Dictionary[BaseCharacter, Array] = {}
 
 func _ready() -> void:
 	dot_material_reachable.shader = PATH_HIGHLIGHT_SHADER
@@ -32,6 +35,7 @@ func _ready() -> void:
 	SignalBus.battle_driver_initialized.connect(func(driver): battle_driver = driver)
 	SignalBus.enemy_selected_action.connect(_on_enemy_selected_action)
 	SignalBus.on_all_characters_spawned.connect(_on_all_characters_spawned)
+	SignalBus.action_executed.connect(_on_action_executed)
 
 func _process(_delta: float) -> void:
 	if base_map == null:
@@ -45,10 +49,11 @@ func _process(_delta: float) -> void:
 		tile_highlight.position = MapHelpers.cell_to_pixel(cell_pos)
 	else:
 		tile_highlight.visible = false
-		
+
 func _on_all_characters_spawned(players : Array[Player], enemies : Array[BaseCharacter]):
 	for x in players + enemies:
-		path_dots_dict[x.get_instance_id()] = []
+		path_dots_dict[x] = []
+		attack_dots_dict[x] = []
 	
 func _unhandled_input(event: InputEvent) -> void:
 	#assert(battle_driver != null)
@@ -66,63 +71,61 @@ func _unhandled_input(event: InputEvent) -> void:
 func _display_selected_action(event: InputEvent):
 	if battle_driver.current_character.action_count > 0:
 		if battle_driver.current_character is Player:
-			var id = battle_driver.current_character.get_instance_id()
+			var character = battle_driver.current_character
 			if event is InputEventMouse:
 				var mouse_pos = base_map.map_floor.get_local_mouse_position()
 				var target_cell = MapHelpers.pixel_to_cell(mouse_pos)
 				
-				display_path_dots(id, target_cell)
-				display_attack_highlight(target_cell)
+				display_path_dots(character, target_cell)
+				display_attack_highlight(character, target_cell)
 				
 				if event.button_mask & MouseButton.MOUSE_BUTTON_LEFT:
 					battle_driver.current_character.execute_action(target_cell)
 					if battle_driver.current_character.is_moving:
-						_update_path_dots(id, [])
+						_update_path_dots(character, [])
 
 func _on_enemy_selected_action(enemy : BaseCharacter, action : CombatAction):
 	print("Show action of enemy: %s" % str(action.display_name))
 	#display_enemy_path_dots(action.path)
-	var id = enemy.get_instance_id()
-	_update_path_dots(id, action.path, action.movement)
+	_update_path_dots(enemy, action.path, action.movement)
+	display_attack_highlight(enemy, action.targeted_cells[0])
 	
-func display_enemy_path_dots(path : Array[Vector2i]):
-	pass	
 
-func display_path_dots(id : int, cell : Vector2i):
-	if battle_driver.current_character.is_moving:
+func display_path_dots(character : BaseCharacter, cell : Vector2i):
+	if character.is_moving:
 		return
 		
-	if battle_driver.current_character.selected_action.movement == 0:
-		_update_path_dots(id, [])
+	if character.selected_action.movement == 0:
+		_update_path_dots(character, [])
 		return	
 	
-	var movement_points = battle_driver.current_character.selected_action.movement
+	var movement_points = character.selected_action.movement
 	if base_map.is_tile_walk_selectable(cell):
-		if not battle_driver.current_character.is_moving:
+		if not character.is_moving:
 			if not _is_cell_targeted:
 				_is_cell_targeted = true
 				_current_targeted_cell = cell		
-				_update_path_dots(id, battle_driver.current_character.get_preferred_path_to(cell),movement_points)
+				_update_path_dots(character, character.get_preferred_path_to(cell),movement_points)
 			elif cell != _current_targeted_cell:
 				_current_targeted_cell = cell
-				_update_path_dots(id, battle_driver.current_character.get_preferred_path_to(cell),movement_points)
+				_update_path_dots(character, character.get_preferred_path_to(cell),movement_points)
 	else:
 		_is_cell_targeted = false
-		_update_path_dots(id, [])
+		_update_path_dots(character, [])
 	
-func _update_path_dots(id : int, path: Array[Vector2i], movement_points : int = 0) -> void:
+func _update_path_dots(character : BaseCharacter, path: Array[Vector2i], movement_points : int = 0) -> void:
 	if path.size() == 0:
-		for child in path_dots_dict[id]:
+		for child in path_dots_dict[character]:
 			(child as Node2D).visible = false
 	else:
-		if path_dots_dict[id].size() < path.size() - 1:
-			for i in path.size() - 1 -  path_dots_dict[id].size():
+		if path_dots_dict[character].size() < path.size() - 1:
+			for i in path.size() - 1 -  path_dots_dict[character].size():
 				var dot = PATH_HIGHLIGHT_SCENE.instantiate()
-				path_dots_dict[id].append(dot)
+				path_dots_dict[character].append(dot)
 				path_dots.add_child(dot)
 				
-		for i in path_dots_dict[id].size():
-			var dot = path_dots_dict[id][i - 1] as Node2D
+		for i in path_dots_dict[character].size():
+			var dot = path_dots_dict[character][i - 1] as Node2D
 			if i < path.size() - 1:
 				dot.visible = true
 				dot.position = MapHelpers.cell_to_pixel(path[i + 1])
@@ -133,18 +136,37 @@ func _update_path_dots(id : int, path: Array[Vector2i], movement_points : int = 
 					dot.material = dot_material_unreachable
 			else:
 				dot.visible = false
-				
-func display_attack_highlight(target_cell : Vector2i):
-	if battle_driver.current_character.selected_action.damage == 0:
-		return
+
+func _on_action_executed(character : BaseCharacter):
+		if character == battle_driver.current_character:
+			for child in attack_dots_dict[character]:
+				(child as Node2D).visible = false
+			
+func display_attack_highlight(character : BaseCharacter, target_cell : Vector2i):
+	#if character.selected_action.damage == 0:
+		#return
 		
 	var on_valid_target = false
 	if EnumHelpers.has_flag(
-		battle_driver.current_character.selected_action.valid_target_flags, 
+		character.selected_action.valid_target_flags, 
 		CombatAction.ValidTargetFlags.OPPONENTS):
-			for enemy in battle_driver.Enemies:
+			var opponents = battle_driver.get_opponents(character)
+			for enemy in opponents:
 				if enemy.current_cell == target_cell:
 					on_valid_target = true
-					
-	attack_highlight.position = MapHelpers.cell_to_pixel(target_cell)
-	attack_highlight.visible = on_valid_target
+
+	if on_valid_target:
+		var dot : Node2D
+		if attack_dots_dict[character].size() == 0:
+			dot = ATTACK_HIGHLIGHT_SCENE.instantiate()
+			attack_dots_dict[character].append(dot)
+			attack_dots.add_child(dot)
+		if attack_dots_dict[character].size() > 0: #Todo: Check amount of needed dots for AOE attacks
+			dot = attack_dots_dict[character][0] as Node2D	
+
+		dot.position = MapHelpers.cell_to_pixel(target_cell)
+		dot.visible = on_valid_target
+
+	elif attack_dots_dict[character].size() > 0:
+		for child in attack_dots_dict[character]:
+			(child as Node2D).visible = false

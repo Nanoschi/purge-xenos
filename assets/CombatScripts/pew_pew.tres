@@ -10,5 +10,6 @@ description = "Shoots at target"
 damage = 1
 cost = 1
 icon = ExtResource("1_v7bqk")
+adjusts_targets = true
 valid_target_flags = 4
 metadata/_custom_type_script = "uid://bcseivrinftr5"

@@ -80,6 +80,13 @@ func run_turn():
 		print("No current character")
 		return
 	current_character.start_turn()
+
+func get_opponents(character : BaseCharacter):
+	# FYI: Performance wise it would be better to check players.
+	# But this leads to a parsing problem BaseCharacter <-> Player
+	if Enemies.has(character):
+		return Players
+	return Enemies
 		
 func on_character_died(character : BaseCharacter) -> void :
 	Enemies.erase(character)
