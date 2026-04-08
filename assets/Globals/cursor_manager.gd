@@ -58,7 +58,6 @@ func _on_all_characters_spawned(players : Array[Player], enemies : Array[BaseCha
 		path_dots_dict[x] = []
 		attack_dots_dict[x] = []
 		
-
 	SignalBus.after_action_executed.connect(_on_after_action_executed)
 	
 	
@@ -171,7 +170,7 @@ func _on_after_action_executed(character : BaseCharacter, action : CombatAction)
 		if character == battle_driver.current_character:
 			for child in attack_dots_dict[character]:
 				(child as Node2D).visible = false
-			
+
 func display_attack_highlight(character : BaseCharacter, target_cell : Vector2i):
 	#if character.selected_action.damage == 0:
 		#return
