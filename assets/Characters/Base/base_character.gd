@@ -29,8 +29,9 @@ var selected_action : CombatAction:
 
 
 var action_count: int = 0
-var idling_bot = false
-var is_moving = false
+var idling_bot : bool= false
+var is_moving : bool= false
+var has_battle_started : bool = false
 
 @onready var sprite = $AnimatedSprite2D
 
@@ -43,11 +44,15 @@ const DIRECTION_SUFFIXES: = {
 
 
 # Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-					
-	var current_pixel_pos = MapHelpers.cell_to_pixel(current_cell)
-	self.position = current_pixel_pos
-	base_map.pathfind.add_character(current_cell)
+#func _ready() -> void:
+	#var current_pixel_pos = MapHelpers.cell_to_pixel(current_cell)
+	#self.position = current_pixel_pos
+	#base_map.pathfind.add_character(current_cell)
+
+
+func _on_battle_started():
+		Log.debug("Battle started, character %s can start acting" % str(self))
+		has_battle_started = true
 
 func _process(_delta: float) -> void:
 	pass
@@ -72,7 +77,7 @@ func move_delta(delta_cells : Vector2i):
 func execute_deal_damage(targeted_cells : Array[Vector2i], damage : int):
 	if damage == 0:
 		return
-	print("Dealt damage to %s, amount: %d" % [str(targeted_cells), damage ])
+	Log.debug("Dealt damage to %s, amount: %d" % [str(targeted_cells), damage ])
 
 func execute_move(target: Vector2i):
 	if is_moving:
@@ -119,14 +124,14 @@ func tween_movement(path : Array[Vector2i]):
 		move_tween.tween_property(self, "position", pixel_step, 0.2)
 	
 	move_tween.tween_callback(func(): is_moving = false)
-	#move_tween.tween_callback(func(): SignalBus.after_action_executed.emit(self, selected_action))
+	move_tween.tween_callback(func(): SignalBus.after_action_executed.emit(self, selected_action))
 	move_tween.tween_callback(func(): current_cell = path[-1])
 
 func update_current_cell():
 	current_cell = MapHelpers.cell_to_pixel(position)
 	
 func move(path : Array[Vector2i]):
-	print("Move was called")
+	Log.debug("Move was called")
 	if is_moving:
 		return
 

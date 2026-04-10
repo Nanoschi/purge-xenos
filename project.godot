@@ -37,7 +37,7 @@ version_control/autoload_on_startup=true
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/strategy_cam/plugin.cfg")
+enabled=PackedStringArray("res://addons/log/plugin.cfg", "res://addons/reload_current_scene/plugin.cfg", "res://addons/strategy_cam/plugin.cfg")
 
 [input]
 
@@ -80,6 +80,11 @@ cam_drag={
 "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":8,"position":Vector2(221, 24),"global_position":Vector2(235, 97),"factor":1.0,"button_index":4,"canceled":false,"pressed":true,"double_click":false,"script":null)
 ]
 }
+
+[log_gd]
+
+config/log_level=0
+config/timestamp_type=4
 
 [physics]
 

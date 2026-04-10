@@ -13,7 +13,6 @@ var _current_targeted_cell: Vector2i
 
 const PATH_HIGHLIGHT_SCENE = preload("res://assets/Maps/PathHighlight.tscn")
 const PATH_HIGHLIGHT_SHADER = preload("res://assets/Materials/path_highlight.gdshader")
-
 const ATTACK_HIGHLIGHT_SCENE = preload("res://assets/Maps/AttackHighlight.tscn")
 
 const DOT_COLOR_REACHABLE = Vector3(1, 1, 0)
@@ -91,8 +90,7 @@ func _display_selected_action(event: InputEvent):
 						_update_path_dots(character, [])
 
 func _on_enemy_selected_action(enemy : BaseCharacter, action : CombatAction):
-	print("Show action of enemy: %s" % str(action.display_name))
-	#display_enemy_path_dots(action.path)
+	Log.debug("Show action of enemy: %s" % str(action.display_name))
 	_update_path_dots(enemy, action.path, action.movement)
 	_hide_line_of_sight(enemy)
 	if action.needs_line_of_sight:

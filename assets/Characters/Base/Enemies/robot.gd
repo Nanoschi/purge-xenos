@@ -16,15 +16,22 @@ func _process(delta: float) -> void:
 func _ready() -> void:
 	SignalBus.before_action_executed.connect(_on_before_action_executed)
 	SignalBus.after_action_executed.connect(_on_after_action_executed)
-
+	SignalBus.battle_started.connect(_on_battle_started)
+	
+	
 func _on_before_action_executed(character : BaseCharacter, action : CombatAction):
+	if not has_battle_started:
+		return
 	if character != self:
 		selected_action = combat_actions[CombatAction.ActionType.WAIT]
 		SignalBus.enemy_selected_action.emit(self, selected_action)
 	
 func _on_after_action_executed(character : BaseCharacter, action : CombatAction):
-	selected_action = ai_select_action()
-	SignalBus.enemy_selected_action.emit(self, selected_action)
+	if not has_battle_started:
+		return
+	if character != self:
+		selected_action = ai_select_action()
+		SignalBus.enemy_selected_action.emit(self, selected_action)
 
 ## Creates an instance of a pre-configured Robot
 static func create(base_map : BaseMap, max_action_count : int, current_cell : Vector2i) -> BaseCharacter:
@@ -65,7 +72,7 @@ func ai_select_action() -> CombatAction:
 	var path = base_map.get_astar_path(current_cell, player.current_cell, true)
 	if path.size() > action.movement + 1:
 		path = path.slice(0, action.movement + 1) 
-		print(path)
+		
 	action.path = path
 
 
@@ -89,11 +96,11 @@ func execute_action(target: Vector2i):
 	executor.excecute(self)
 	
 	if EnumHelpers.has_flag(CombatAction.ValidTargetFlags.SELF, selected_action.valid_target_flags):
-		print("Enemy has done: %s" % selected_action.display_name)
+		Log.debug("Enemy has done: %s" % selected_action.display_name)
 		SignalBus.after_action_executed.emit(self,selected_action)
 	elif EnumHelpers.has_flag(CombatAction.ValidTargetFlags.OPPONENTS, selected_action.valid_target_flags):
-		print("Enemy has done: %s" % selected_action.display_name)
+		Log.debug("Enemy has done: %s" % selected_action.display_name)
 		SignalBus.after_action_executed.emit(self,selected_action)
 	elif EnumHelpers.has_flag(CombatAction.ValidTargetFlags.CELL, selected_action.valid_target_flags):
-		print("Enemy has done: %s" % selected_action.display_name)
+		Log.debug("Enemy has done: %s" % selected_action.display_name)
 		SignalBus.after_action_executed.emit(self,selected_action)

@@ -77,7 +77,7 @@ func next_turn():
 	
 func run_turn():
 	if current_character == null:
-		print("No current character")
+		Log.debug("No current character")
 		return
 	current_character.start_turn()
 
