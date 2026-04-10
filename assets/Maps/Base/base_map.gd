@@ -1,8 +1,8 @@
 extends Node2D
 class_name BaseMap
 
-@export 
-var pathfind: Pathfind
+@export var pathfind: Pathfind
+var cell_debug_label_scene : PackedScene = preload("uid://s05eepwpbj7e")
 
 @onready var map_floor: MapFloor = $Floor
 @onready var map_walls: Node2D = $Walls
@@ -12,7 +12,16 @@ func _ready():
 	# sets the current map (self) at the cursor manager
 	SignalBus.main_init_finished.connect(func(): 
 		SignalBus.map_initialized.emit(self))
-
+	
+	if Log.get_log_level() == Log.Levels.DEBUG:
+		Log.debug("Cell coordinates logging is on!")
+		for x in map_floor.get_used_rect().size.x:
+			for y in map_floor.get_used_rect().size.y:
+				var cell_debug_label = cell_debug_label_scene.instantiate() as CellDebugLabel
+				cell_debug_label.current_cell = Vector2i(x,y)
+				cell_debug_label.position = MapHelpers.cell_to_pixel(cell_debug_label.current_cell)
+				self.add_child(cell_debug_label)
+			
 func is_tile_walk_selectable(pos: Vector2i) -> bool:
 	return pathfind.astar_grid.region.has_point(pos) and not pathfind.astar_grid.is_point_solid(pos)
 
@@ -34,29 +43,59 @@ func get_used_rect() -> Rect2:
 	return Rect2(world_position, world_size)
 
 
-func get_cells_on_line(from_cell: Vector2i, to_cell: Vector2i) -> Array[Vector2i]:
-	#implements bresenham algorithm
-	var cells: Array[Vector2i] = []
-	var dx = abs(to_cell.x - from_cell.x)
-	var dy = abs(to_cell.y - from_cell.y)
-	var sx = 1 if from_cell.x < to_cell.x else -1
-	var sy = 1 if from_cell.y < to_cell.y else -1
-	var err = dx - dy
-	var x = from_cell.x
-	var y = from_cell.y
-	while true:
-		cells.append(Vector2i(x, y))
-		if x == to_cell.x and y == to_cell.y:
-			break
-		var e2 = 2 * err
-		if e2 > -dy:
-			err -= dy
-			x += sx
-		if e2 < dx:
-			err += dx
-			y += sy
-	return cells
-										
+# los = line of sight
+func get_los_to_enemies(from : Vector2i, enemy_group_name : String) -> Array:
+	var result = []
+	for child in self.get_children(): 
+		var c = child as BaseCharacter
+		if c == null:
+			continue
+		if c.get_groups().has(enemy_group_name):
+			var los = get_line_of_sight(from, c.current_cell, true, true)
+			if los.size() > 0:
+				result.append(los)
+	return result
+
+
+func get_line_of_sight(from_cell: Vector2i,
+	to_cell: Vector2i,
+	ignore_solid_from: bool,
+	ignore_solid_to: bool) -> Array[Vector2]:
+	
+	# Compute the segment in world coordinates
+	var segment_start = MapHelpers.cell_to_pixel(from_cell)
+	var segment_end = MapHelpers.cell_to_pixel(to_cell)
+	
+	# Get cell size from MapHelpers
+	var cell_size = MapHelpers.cell_size
+	
+	# Get the region of the astar grid
+	var region = pathfind.astar_grid.region
+	
+	# Iterate over all cells in the grid region
+	for x in range(region.position.x, region.position.x + region.size.x):
+		for y in range(region.position.y, region.position.y + region.size.y):
+			var cell = Vector2i(x, y)
+			# Skip non-solid cells
+			if not pathfind.astar_grid.is_point_solid(cell):
+				continue
+				
+			# Skip from/to cells if ignoring them
+			if (cell == from_cell and ignore_solid_from) or (cell == to_cell and ignore_solid_to):
+				continue
+
+			# Compute the tile rectangle in world coordinates
+			var tile_center = MapHelpers.cell_to_pixel(cell)
+			var tile_rect = Rect2(tile_center - Vector2(cell_size) / 2, Vector2(cell_size))
+			
+			# Test if the segment intersects the tile rectangle
+			if segment_intersects_rect(segment_start, segment_end, tile_rect):
+				# Line of sight is blocked
+				return []
+	
+	# No intersections found, line of sight is clear
+	return [segment_start, segment_end]
+
 func segment_intersects_rect(from_point: Vector2, to_point: Vector2, rect: Rect2) -> bool:
 	if rect.has_point(from_point) or rect.has_point(to_point):
 		return true
@@ -76,29 +115,3 @@ func segment_intersects_rect(from_point: Vector2, to_point: Vector2, rect: Rect2
 		return true
 
 	return false
-
-# los = line of sight
-func get_los_to_enemies(from : Vector2i, enemy_group_name : String) -> Array:
-	var result = []
-	for child in self.get_children(): 
-		var c = child as BaseCharacter
-		if c == null:
-			continue
-		if c.get_groups().has(enemy_group_name):
-			var los = get_line_of_sight(from, c.current_cell, true, true)
-			if los.size() > 0:
-				result.append(los)
-	return result
-
-func get_line_of_sight(from_cell: Vector2i,
- to_cell: Vector2i,
- ignore_solid_from: bool,
- ignore_solid_to: bool) -> Array[Vector2]:
-		
-	var cells = get_cells_on_line(from_cell, to_cell)
-	for cell in cells:
-		if pathfind.astar_grid.is_point_solid(cell) and not (
-					(cell == from_cell and ignore_solid_from) 
-					or (cell == to_cell and ignore_solid_to)):	
-			return []
-	return [MapHelpers.cell_to_pixel(from_cell), MapHelpers.cell_to_pixel(to_cell)]

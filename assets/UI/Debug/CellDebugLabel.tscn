@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://s05eepwpbj7e"]
+
+[ext_resource type="Script" uid="uid://2hdbrkxojqqe" path="res://assets/UI/Debug/cell_debug_label.gd" id="1_kvgqf"]
+
+[node name="CellDebugLabel" type="Label" unique_id=256307055]
+theme_override_font_sizes/font_size = 8
+text = "(xx/yy)"
+script = ExtResource("1_kvgqf")
