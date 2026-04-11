@@ -7,11 +7,12 @@ var max_action_count : int
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	if action_count > 0 and not idling_bot:
-		idling_bot = true
-		await get_tree().create_timer(1.0).timeout
-		execute_action(Vector2i(0, 0))
-		idling_bot = false
+	pass
+	#if action_count > 0 and not idling_bot:
+		#idling_bot = true
+		#await get_tree().create_timer(1.0).timeout
+		#execute_action(Vector2i(0, 0))
+		#idling_bot = false
 
 func _ready() -> void:
 	SignalBus.before_action_executed.connect(_on_before_action_executed)
@@ -83,10 +84,20 @@ func _on_pre_begin_turn():
 	SignalBus.enemy_selected_action.emit(self, selected_action)
 	
 func start_turn():
+	Log.debug("Turn started for '%s'" % [self])
 	action_count = max_action_count
+	
+	while action_count > 0:
+		await get_tree().create_timer(1.0).timeout
+		execute_action(Vector2i(0, 0))
 
+func execute_deal_damage(targeted_cells : Array[Vector2i], damage : int):
+	if damage == 0:
+		return
+	action_count -= selected_action.cost
+	Log.debug("Dealt damage to %s, amount: %d" % [str(targeted_cells), damage ])	
+	
 func execute_action(target: Vector2i):
-	action_count -= 1
 	
 	selected_action = ai_select_action()
 	

@@ -28,7 +28,18 @@ var selected_action : CombatAction:
 		return selected_action
 
 
-var action_count: int = 0
+var action_count: int:
+	set(value):
+		if value < 0:
+			Log.err("action count < 0 for '%s'" % [self])
+		value = max(0, value)
+		if value == action_count:
+			return
+		action_count = value
+		Log.debug("Action count of '%s' is: %d" % [self, action_count])
+	get:
+		return action_count
+		
 var idling_bot : bool= false
 var is_moving : bool= false
 var has_battle_started : bool = false
@@ -75,9 +86,7 @@ func move_delta(delta_cells : Vector2i):
 	move(path)	
 
 func execute_deal_damage(targeted_cells : Array[Vector2i], damage : int):
-	if damage == 0:
-		return
-	Log.debug("Dealt damage to %s, amount: %d" % [str(targeted_cells), damage ])
+	pass
 
 func execute_move(target: Vector2i):
 	if is_moving:
@@ -101,6 +110,8 @@ func execute_move(target: Vector2i):
 	if path.size() <= 1:
 		is_moving = false
 		return
+	
+	action_count -= selected_action.cost
 	
 	tween_movement(path)
 

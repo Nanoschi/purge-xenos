@@ -35,14 +35,14 @@ static func create(base_map : BaseMap,
 		return player
 
 func start_turn():
+	Log.debug("Turn started for '%s'" % [self])
 	action_count = max_action_count
-	Log.debug("Character (%d) turn started" % player_index)
-
+	
 func execute_attack(target: Vector2i):
+	action_count -= selected_action.cost
 	SignalBus.after_action_executed.emit(self,selected_action)
 
 func execute_action(target: Vector2i):
-	action_count -= 1
 	
 	SignalBus.before_action_executed.emit(self, selected_action)
 	
