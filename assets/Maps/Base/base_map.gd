@@ -109,6 +109,33 @@ func get_line_of_sight(from_cell: Vector2i,
 	# No intersections found, line of sight is clear
 	return [segment_start, segment_end]
 
+## Returns all cells that can be targeted from any cell in [param from_cells]
+## within Chebyshev [param weapon_range], respecting line of sight.
+func get_attack_threat_cells(from_cells: Array[Vector2i], weapon_range: int) -> Array[Vector2i]:
+	if weapon_range <= 0:
+		return []
+	var seen: Dictionary = {}
+	var result: Array[Vector2i] = []
+	for from in from_cells:
+		for dx in range(-weapon_range, weapon_range + 1):
+			for dy in range(-weapon_range, weapon_range + 1):
+				var dist = maxi(abs(dx), abs(dy))
+				if dist == 0 or dist > weapon_range:
+					continue
+				var candidate = from + Vector2i(dx, dy)
+				if seen.has(candidate):
+					continue
+				if not pathfind.astar_grid.region.has_point(candidate):
+					continue
+				# Exclude map geometry (walls, interior) but allow character-occupied cells,
+				# since those are valid attack targets.
+				if pathfind._map_solid.has(candidate):
+					continue
+				seen[candidate] = true
+				if get_line_of_sight(from, candidate, true, true).size() > 0:
+					result.append(candidate)
+	return result
+
 func segment_intersects_rect(from_point: Vector2, to_point: Vector2, rect: Rect2) -> bool:
 	if rect.has_point(from_point) or rect.has_point(to_point):
 		return true

@@ -14,9 +14,17 @@ var _current_targeted_cell: Vector2i
 const PATH_HIGHLIGHT_SCENE = preload("res://assets/Maps/PathHighlight.tscn")
 const PATH_HIGHLIGHT_SHADER = preload("res://assets/Materials/path_highlight.gdshader")
 const ATTACK_HIGHLIGHT_SCENE = preload("res://assets/Maps/AttackHighlight.tscn")
+const TILE_HIGHLIGHT_SCENE = preload("res://assets/Maps/TileHighlight.tscn")
+const FLOOR_HIGHLIGHT_SHADER = preload("res://assets/Materials/floor_highlight.gdshader")
+const TILE_HIGHLIGHT_TEXTURE = preload("res://assets/Materials/tile_highlight_rect_full_texture.png")
 
 const DOT_COLOR_REACHABLE = Vector3(1, 1, 0)
 const DOT_COLOR_UNREACHABLE = Vector3(1, 0, 0)
+
+# Threat overlay colors: tier 1 movement (orange), tier 2+ movement (red), attack range (purple)
+const THREAT_COLOR_TIER1 = Color(1.0, 0.45, 0.0, 1.0)
+const THREAT_COLOR_TIER2 = Color(0.85, 0.1, 0.1, 1.0)
+const THREAT_COLOR_ATTACK = Color(0.65, 0.0, 0.85, 1.0)
 
 var dot_material_reachable = ShaderMaterial.new()
 var dot_material_unreachable = ShaderMaterial.new()
@@ -27,12 +35,56 @@ var attack_dots_dict : Dictionary[BaseCharacter, Array] = {}
 # Key: Character. Value: Array of Line2D
 var attack_lines_dict : Dictionary[BaseCharacter, Line2D] = {}
 
+var _mat_threat_tier1: ShaderMaterial
+var _mat_threat_tier2: ShaderMaterial
+var _mat_threat_attack: ShaderMaterial
+var _hovering_enemy: BaseCharacter = null
+var _move_threat_tiles: Array = []
+var _attack_threat_tiles: Array = []
+var _threat_container: Node2D
+
+# Sequential threat animation state
+var _threat_tier_cells: Array = []  # Array of Array[Vector2i], one per tier
+var _threat_current_tier: int = 0
+var _threat_timer: Timer = null
+
 func _ready() -> void:
 	dot_material_reachable.shader = PATH_HIGHLIGHT_SHADER
 	dot_material_reachable.set_shader_parameter("color", DOT_COLOR_REACHABLE)
 	dot_material_unreachable.shader = PATH_HIGHLIGHT_SHADER
 	dot_material_unreachable.set_shader_parameter("color", DOT_COLOR_UNREACHABLE)
-	
+
+	_mat_threat_tier1 = ShaderMaterial.new()
+	_mat_threat_tier1.shader = FLOOR_HIGHLIGHT_SHADER
+	#_mat_threat_tier1.set_shader_parameter("overlay_texture", TILE_HIGHLIGHT_TEXTURE)
+	_mat_threat_tier1.set_shader_parameter("color", THREAT_COLOR_TIER1)
+	_mat_threat_tier1.set_shader_parameter("pulse_speed", 2.0)
+	_mat_threat_tier1.set_shader_parameter("opacity", 0.5)
+
+	_mat_threat_tier2 = ShaderMaterial.new()
+	_mat_threat_tier2.shader = FLOOR_HIGHLIGHT_SHADER
+	#_mat_threat_tier2.set_shader_parameter("overlay_texture", TILE_HIGHLIGHT_TEXTURE)
+	_mat_threat_tier2.set_shader_parameter("color", THREAT_COLOR_TIER2)
+	_mat_threat_tier2.set_shader_parameter("pulse_speed", 2.0)
+	_mat_threat_tier2.set_shader_parameter("opacity", 0.5)
+
+	_mat_threat_attack = ShaderMaterial.new()
+	_mat_threat_attack.shader = FLOOR_HIGHLIGHT_SHADER
+	#_mat_threat_attack.set_shader_parameter("overlay_texture", TILE_HIGHLIGHT_TEXTURE)
+	_mat_threat_attack.set_shader_parameter("color", THREAT_COLOR_ATTACK)
+	_mat_threat_attack.set_shader_parameter("pulse_speed", 2.0)
+	_mat_threat_attack.set_shader_parameter("opacity", 0.35)
+
+	_threat_container = Node2D.new()
+	_threat_container.name = "ThreatHighlights"
+	add_child(_threat_container)
+
+	_threat_timer = Timer.new()
+	_threat_timer.wait_time = 2.0
+	_threat_timer.one_shot = false
+	_threat_timer.timeout.connect(_on_threat_timer_timeout)
+	add_child(_threat_timer)
+
 	SignalBus.map_initialized.connect(func(map): base_map = map)
 	SignalBus.battle_driver_initialized.connect(func(driver): battle_driver = driver)
 	SignalBus.on_all_characters_spawned.connect(_on_all_characters_spawned)
@@ -51,6 +103,22 @@ func _process(_delta: float) -> void:
 		tile_highlight.position = MapHelpers.cell_to_pixel(cell_pos)
 	else:
 		tile_highlight.visible = false
+
+	var hovered_enemy: BaseCharacter = null
+	if battle_driver != null:
+		for enemy in battle_driver.Enemies:
+			if enemy == null or not is_instance_valid(enemy):
+				continue
+			if enemy.current_cell == cell_pos:
+				hovered_enemy = enemy
+				break
+
+	if hovered_enemy != _hovering_enemy:
+		_hovering_enemy = hovered_enemy
+		if hovered_enemy != null:
+			_refresh_enemy_threat(hovered_enemy)
+		else:
+			_clear_enemy_threat()
 
 func _on_all_characters_spawned(players : Array[Player], enemies : Array[BaseCharacter]):
 	for x in players + enemies:
@@ -168,6 +236,90 @@ func _on_after_action_executed(character : BaseCharacter, action : CombatAction)
 		if character == battle_driver.current_character:
 			for child in attack_dots_dict[character]:
 				(child as Node2D).visible = false
+
+## Calculates movement tiers for [param enemy] and starts sequential display.
+func _refresh_enemy_threat(enemy: BaseCharacter) -> void:
+	_clear_enemy_threat()
+	_threat_tier_cells.clear()
+
+	var move_action: CombatAction = null
+	for action in enemy.combat_actions.values():
+		if action.action_type == CombatAction.ActionType.MOVE:
+			move_action = action
+			break
+
+	if move_action == null or move_action.cost <= 0:
+		return
+
+	var max_uses = int(enemy.max_action_count / move_action.cost)
+	var prev_tier_set: Dictionary = {}
+
+	for tier in range(1, max_uses + 1):
+		var tier_cells = base_map.pathfind.get_reachable_cells(enemy.current_cell, move_action.movement * tier)
+		var exclusive: Array[Vector2i] = []
+		for cell in tier_cells:
+			if not prev_tier_set.has(cell):
+				exclusive.append(cell)
+		_threat_tier_cells.append(exclusive)
+		prev_tier_set.clear()
+		for cell in tier_cells:
+			prev_tier_set[cell] = true
+
+	if _threat_tier_cells.is_empty():
+		return
+
+	_threat_current_tier = 0
+	_show_threat_tier(_threat_current_tier)
+	_threat_timer.start()
+
+func _on_threat_timer_timeout() -> void:
+	_threat_current_tier = (_threat_current_tier + 1) % _threat_tier_cells.size()
+	_clear_move_threat_tiles()
+	_show_threat_tier(_threat_current_tier)
+
+func _show_threat_tier(tier_index: int) -> void:
+	var mat = _mat_threat_tier1 if tier_index == 0 else _mat_threat_tier2
+	for cell in _threat_tier_cells[tier_index]:
+		var tile = _get_or_create_move_threat_tile(mat)
+		tile.position = MapHelpers.cell_to_pixel(cell)
+		tile.visible = true
+
+func _clear_move_threat_tiles() -> void:
+	for tile in _move_threat_tiles:
+		(tile as Node2D).visible = false
+
+func _clear_enemy_threat() -> void:
+	_threat_timer.stop()
+	_threat_tier_cells.clear()
+	for tile in _move_threat_tiles:
+		(tile as Node2D).visible = false
+	for tile in _attack_threat_tiles:
+		(tile as Node2D).visible = false
+
+func _get_or_create_move_threat_tile(mat: ShaderMaterial) -> Node2D:
+	for tile in _move_threat_tiles:
+		var n = tile as Node2D
+		if not n.visible:
+			n.material = mat
+			return n
+	var tile = TILE_HIGHLIGHT_SCENE.instantiate() as Node2D
+	tile.material = mat
+	tile.visible = false
+	_threat_container.add_child(tile)
+	_move_threat_tiles.append(tile)
+	return tile
+
+func _get_or_create_attack_threat_tile() -> Node2D:
+	for tile in _attack_threat_tiles:
+		var n = tile as Node2D
+		if not n.visible:
+			return n
+	var tile = TILE_HIGHLIGHT_SCENE.instantiate() as Node2D
+	tile.material = _mat_threat_attack
+	tile.visible = false
+	_threat_container.add_child(tile)
+	_attack_threat_tiles.append(tile)
+	return tile
 
 func display_attack_highlight(character : BaseCharacter, target_cell : Vector2i):
 	#if character.selected_action.damage == 0:

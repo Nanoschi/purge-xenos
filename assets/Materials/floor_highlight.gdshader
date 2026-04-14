@@ -3,6 +3,7 @@ shader_type canvas_item;
 uniform sampler2D overlay_texture: repeat_enable, filter_nearest;
 uniform vec4 color : source_color;
 uniform float pulse_speed = 1.0;
+uniform bool is_pulsing = false;
 uniform float opacity = 0.4;
 
 varying vec2 vertex_position;
@@ -23,10 +24,14 @@ float get_falloff_factor(vec2 position) {
 }
 
 void fragment() {
-	float pulse_factor = pow(sin(TIME * pulse_speed), 2);
-	vec4 tex_color = texture(overlay_texture, UV * 3.0f);
+	float pulse_factor = 1.0;
+	if(is_pulsing){
+	 	pulse_factor = pow(sin(TIME * pulse_speed), 2);	
+	}
+	vec4 tex_color = texture(overlay_texture, UV * 1.0f);
 	vec4 shifted_color = tex_color * color;
 	COLOR = vec4(
 	shifted_color.xyz, 
-	shifted_color.a * pulse_factor * opacity * get_falloff_factor(vertex_position));
+	//shifted_color.a * pulse_factor * opacity * get_falloff_factor(vertex_position));
+	shifted_color.a * pulse_factor * opacity * 1.0);
     }
