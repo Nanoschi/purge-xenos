@@ -277,7 +277,7 @@ size = Vector2(9, 27)
 
 [node name="BaseCharacter" type="Marker2D" unique_id=1271547261]
 script = ExtResource("1_qocqw")
-current_cell = Vector2i(7, 7)
+current_cell = Vector2i(1, 1)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=487185866]
 sprite_frames = SubResource("SpriteFrames_7hrrp")

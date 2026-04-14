@@ -25,11 +25,17 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	pass
 
+func set_point_solid(pos: Vector2i, solid: bool) -> void:
+	# if pos == Vector2i(7,7):
+	# 	var x = 5
+	# Log.debug("set_point_solid: %s -> solid=%s" % [pos, solid])
+	astar_grid.set_point_solid(pos, solid)
+
 func remove_character(cell_pos: Vector2i):
-	astar_grid.set_point_solid(cell_pos, false)
+	set_point_solid(cell_pos, false)
 
 func add_character(cell_pos: Vector2i):
-	astar_grid.set_point_solid(cell_pos, true)
+	set_point_solid(cell_pos, true)
 	
 func load_tilemap_props(tilemapLayer : TileMapLayer, check_empty_cells : bool):
 	var grid_size = tilemapLayer.get_used_rect().size
@@ -41,10 +47,10 @@ func load_tilemap_props(tilemapLayer : TileMapLayer, check_empty_cells : bool):
 			var cell = tilemapLayer.get_cell_tile_data(astar_grid_pos)
 						
 			if check_empty_cells && cell == null:
-				astar_grid.set_point_solid(astar_grid_pos, true)
+				set_point_solid(astar_grid_pos, true)
 			
 			if cell == null:
 				continue
 			
 			if  bool(cell.get_custom_data("IsBlocked")):
-				astar_grid.set_point_solid(astar_grid_pos, true)
+				set_point_solid(astar_grid_pos, true)
