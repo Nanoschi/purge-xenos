@@ -2,9 +2,11 @@
 
 [ext_resource type="Script" uid="uid://bcseivrinftr5" path="res://assets/CombatScripts/combat_action.gd" id="1_8u41q"]
 [ext_resource type="Texture2D" uid="uid://4mnnauf6mek5" path="res://assets/CombatScripts/Icons/gun_pistol.png" id="1_v7bqk"]
+[ext_resource type="PackedScene" uid="uid://c61wwx8sxg7y0" path="res://assets/CombatScripts/Bullets/Bullet.tscn" id="2_4j0du"]
 
 [resource]
 script = ExtResource("1_8u41q")
+projectile_scene = ExtResource("2_4j0du")
 display_name = "Pew-Pew"
 description = "Shoots at target"
 damage = 1

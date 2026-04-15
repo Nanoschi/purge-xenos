@@ -34,17 +34,9 @@ func start_turn():
 	Log.debug("Turn started for '%s'" % [self])
 	action_count = max_action_count
 	
-func execute_attack(target: Vector2i):
-	action_count -= selected_action.cost
-	SignalBus.after_action_executed.emit(self,selected_action)
-
 func execute_action(target: Vector2i):
-	
 	SignalBus.before_action_executed.emit(self, selected_action)
-	
 	if selected_action.movement > 0:
-		execute_move(target)
-	if selected_action.damage > 0:
-		execute_attack(target)
-		
-	
+		selected_action.path = get_preferred_path_to(target)
+	var executor = ActionExecutor.new([selected_action])
+	await executor.execute(self)

@@ -44,6 +44,8 @@ var action_count: int:
 var is_moving : bool= false
 var has_battle_started : bool = false
 
+signal move_finished
+
 const DIRECTION_SUFFIXES: = {
 	Directions.Points.NORTH: "_N",
 	Directions.Points.EAST: "_E",
@@ -84,7 +86,9 @@ func move_delta(delta_cells : Vector2i):
 	move(path)	
 
 func execute_deal_damage(targeted_cells : Array[Vector2i], damage : int):
-	pass
+	if damage == 0:
+		return
+	action_count -= selected_action.cost
 
 func execute_move(target: Vector2i):
 	if is_moving:
@@ -95,6 +99,7 @@ func execute_move(target: Vector2i):
 	var path = base_map.pathfind.astar_grid.get_id_path(old_pos, target)
 
 	if selected_action == null:
+		move_finished.emit()
 		return
 	
 	if path.size() - 1 > selected_action.movement:
@@ -107,6 +112,7 @@ func execute_move(target: Vector2i):
 	
 	if path.size() <= 1:
 		is_moving = false
+		move_finished.emit()
 		return
 	
 	action_count -= selected_action.cost
@@ -133,8 +139,8 @@ func tween_movement(path : Array[Vector2i]):
 		move_tween.tween_property(self, "position", pixel_step, 0.2)
 	
 	move_tween.tween_callback(func(): is_moving = false)
-	move_tween.tween_callback(func(): SignalBus.after_action_executed.emit(self, selected_action))
 	move_tween.tween_callback(func(): current_cell = path[-1])
+	move_tween.tween_callback(func(): move_finished.emit())
 
 func update_current_cell():
 	current_cell = MapHelpers.cell_to_pixel(position)

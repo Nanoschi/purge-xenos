@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://c61wwx8sxg7y0"]
+
+[ext_resource type="Texture2D" uid="uid://6jixv5shvcgf" path="res://assets/CombatScripts/Bullets/Textures/bullet_01.png" id="1_idqqs"]
+[ext_resource type="Script" uid="uid://bsaylfbecn8ve" path="res://assets/CombatScripts/Bullets/bullet.gd" id="2_qn30x"]
+
+[node name="Bullet" type="Sprite2D" unique_id=933538373]
+texture = ExtResource("1_idqqs")
+script = ExtResource("2_qn30x")
+target_width = 64
+target_height = 64

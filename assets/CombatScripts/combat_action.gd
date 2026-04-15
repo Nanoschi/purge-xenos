@@ -1,6 +1,9 @@
 class_name CombatAction
 extends Resource
 
+
+
+@export var projectile_scene: PackedScene  # assign Bullet.tscn here in the .tres inspector
 @export var display_name : String
 @export var description : String
 

@@ -88,28 +88,16 @@ func start_turn():
 	
 	while action_count > 0:
 		await get_tree().create_timer(1.0).timeout
-		execute_action(Vector2i(0, 0))
+		await execute_action(Vector2i(0, 0))
 
 func execute_deal_damage(targeted_cells: Array[Vector2i], damage: int):
-	if damage == 0:
-		return
-	action_count -= selected_action.cost
-	Log.debug("Dealt damage to %s, amount: %d" % [str(targeted_cells), damage])
+	super.execute_deal_damage(targeted_cells, damage)
+	if damage > 0:
+		Log.debug("Dealt damage to %s, amount: %d" % [str(targeted_cells), damage])
 	
 func execute_action(target: Vector2i):
 	selected_action = ai_select_action()
-	
-	SignalBus.enemy_selected_action.emit(self , selected_action)
-	
+	SignalBus.before_action_executed.emit(self, selected_action)
+	SignalBus.enemy_selected_action.emit(self, selected_action)
 	var executor = ActionExecutor.new([selected_action])
-	executor.excecute(self )
-	
-	if EnumHelpers.has_flag(CombatAction.ValidTargetFlags.SELF, selected_action.valid_target_flags):
-		Log.debug("Enemy has done: %s" % selected_action.display_name)
-		SignalBus.after_action_executed.emit(self , selected_action)
-	elif EnumHelpers.has_flag(CombatAction.ValidTargetFlags.OPPONENTS, selected_action.valid_target_flags):
-		Log.debug("Enemy has done: %s" % selected_action.display_name)
-		SignalBus.after_action_executed.emit(self , selected_action)
-	elif EnumHelpers.has_flag(CombatAction.ValidTargetFlags.CELL, selected_action.valid_target_flags):
-		Log.debug("Enemy has done: %s" % selected_action.display_name)
-		SignalBus.after_action_executed.emit(self , selected_action)
+	await executor.execute(self)
