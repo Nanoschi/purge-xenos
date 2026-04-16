@@ -15,6 +15,7 @@ signal pre_begin_turn
 signal before_action_executed(character : BaseCharacter, action : CombatAction)
 signal after_action_executed(character : BaseCharacter, action : CombatAction)
 signal hud_camera_resetted
+signal character_died(character : BaseCharacter)
 
 signal display_line_of_sight(character : BaseCharacter, area2d : Area2D)
 signal hide_line_of_sight(character : BaseCharacter)

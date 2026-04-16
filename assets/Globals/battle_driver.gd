@@ -35,6 +35,7 @@ func _ready() -> void:
 	
 	SignalBus.on_hud_is_ready.connect(on_hud_is_ready)
 	SignalBus.on_all_characters_spawned.connect(on_all_characters_spawned)
+	SignalBus.character_died.connect(_on_character_died)
 
 func on_all_characters_spawned(players : Array[Player], enemies : Array[BaseCharacter]):
 	Players.assign(players)
@@ -54,6 +55,9 @@ func on_hud_is_ready() -> void:
 	pass
 			
 func next_turn():
+	if not is_battle_running:
+		return
+		
 	current_character_idx += 1
 	
 	var switch_group = current_character_idx == current_group.size()
@@ -88,7 +92,9 @@ func get_opponents(character : BaseCharacter):
 		return Players
 	return Enemies
 		
-func on_character_died(character : BaseCharacter) -> void :
+func _on_character_died(character : BaseCharacter) -> void :
+	Log.debug("Character '%s' died, removing from battle" % [character])
+
 	Enemies.erase(character)
 	if Enemies.size() == 0:
 		is_battle_running = false

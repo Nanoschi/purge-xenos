@@ -25,7 +25,7 @@ var health: int = max_health
 var base_map: BaseMap
 var Direction : Directions.Points = Directions.Points.EAST
 var combat_actions : Dictionary[CombatAction.ActionType, CombatAction]
-
+var is_dead : bool = false
 
 var selected_action : CombatAction:
 	set(value):		
@@ -103,7 +103,10 @@ func take_damage(amount: int) -> void:
 	health_point_bar.set_points(health)
 	Log.debug("'%s' took %d damage, health is now %d/%d" % [self, amount, health, max_health])
 	if health <= 0:
+		is_dead = true
 		Log.debug("'%s' has been defeated!" % [self])
+		SignalBus.hide_line_of_sight.emit(self)
+		SignalBus.character_died.emit(self)
 		queue_free()
 
 func execute_deal_damage(targeted_cells : Array[Vector2i], damage : int):

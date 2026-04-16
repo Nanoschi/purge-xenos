@@ -20,14 +20,14 @@ func _ready() -> void:
 	
 	
 func _on_before_action_executed(character: BaseCharacter, action: CombatAction):
-	if not has_battle_started:
+	if not has_battle_started or is_dead:
 		return
 	if character != self:
 		selected_action = combat_actions[CombatAction.ActionType.WAIT]
 		SignalBus.enemy_selected_action.emit(self , selected_action)
 	
 func _on_after_action_executed(character: BaseCharacter, action: CombatAction):
-	if not has_battle_started:
+	if not has_battle_started or is_dead:
 		return
 	if character != self:
 		selected_action = ai_select_action()
@@ -79,10 +79,14 @@ func ai_select_action() -> CombatAction:
 	return action
 
 func _on_pre_begin_turn():
+	if not has_battle_started or is_dead:
+		return
 	selected_action = ai_select_action()
 	SignalBus.enemy_selected_action.emit(self , selected_action)
 	
 func start_turn():
+	if not has_battle_started or is_dead:
+		return
 	Log.debug("Turn started for '%s'" % [ self ])
 	action_point_bar.set_max_points(max_action_count)
 	action_count = max_action_count
