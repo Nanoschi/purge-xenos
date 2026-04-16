@@ -7,6 +7,8 @@
 [node name="Player" unique_id=1271547261 groups=["Players_Group"] instance=ExtResource("1_h8fw5")]
 script = ExtResource("1_4xsnp")
 current_cell = Vector2i(5, 5)
+show_action_bar = false
+show_health_bar = false
 
 [node name="StrategyCamera" type="Camera2D" parent="." index="2" unique_id=1735639144]
 zoom = Vector2(2, 2)

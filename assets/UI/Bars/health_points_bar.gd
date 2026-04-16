@@ -1,5 +1,5 @@
 extends ColorRect
-class_name ActionPointsBar
+class_name HealthPointsBar
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

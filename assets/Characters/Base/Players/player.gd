@@ -4,7 +4,9 @@ class_name Player
 const PLAYER_SCENE : PackedScene = preload("res://assets/Characters/Base/Players/Player.tscn")
 
 var player_index : int
-var max_action_count
+
+func _ready() -> void:
+	super._ready()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -26,7 +28,7 @@ static func create(base_map : BaseMap,
 		player.combat_actions = combat_actions
 		player.base_map = base_map
 		player.player_index = player_index
-		player.max_action_count = max_action_count
+		#player.max_action_count = max_action_count
 		player.current_cell = current_cell
 		return player
 

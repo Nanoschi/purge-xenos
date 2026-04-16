@@ -3,8 +3,6 @@ class_name Robot
 
 const ROBOT_SCENE: PackedScene = preload("res://assets/Characters/Base/Enemies/Robot.tscn")
 
-var max_action_count: int
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
@@ -15,6 +13,7 @@ func _process(delta: float) -> void:
 		#idling_bot = false
 
 func _ready() -> void:
+	super._ready()
 	SignalBus.before_action_executed.connect(_on_before_action_executed)
 	SignalBus.after_action_executed.connect(_on_after_action_executed)
 	SignalBus.battle_started.connect(_on_battle_started)
@@ -38,7 +37,7 @@ func _on_after_action_executed(character: BaseCharacter, action: CombatAction):
 static func create(base_map: BaseMap, max_action_count: int, current_cell: Vector2i) -> BaseCharacter:
 	var robot = ROBOT_SCENE.instantiate() as Robot
 	robot.base_map = base_map
-	robot.max_action_count = max_action_count
+	#robot.max_action_count = max_action_count
 	robot.current_cell = current_cell
 	
 	var actions: Dictionary[CombatAction.ActionType, CombatAction] = {}

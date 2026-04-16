@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://be1gc3pil8tda" path="res://assets/Characters/Base/base_character.gd" id="1_qocqw"]
 [ext_resource type="Texture2D" uid="uid://cc7rs1fsr8l4a" path="res://assets/Characters/Tiles/player_blue_armor_walk_no_wpn.png" id="3_5i3ag"]
 [ext_resource type="PackedScene" uid="uid://csba1430u0hwp" path="res://assets/UI/Bars/ActionPointsBar.tscn" id="4_7hrrp"]
+[ext_resource type="PackedScene" uid="uid://da7n0boeoauux" path="res://assets/UI/Bars/HealthPointsBar.tscn" id="5_x8f87"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7hrrp"]
 atlas = ExtResource("1_4qf43")
@@ -297,3 +298,10 @@ offset_top = -20.0
 offset_right = 92.0
 offset_bottom = 13.0
 scale = Vector2(0.135, 0.135)
+
+[node name="HealthPointsBar" parent="." unique_id=1928422567 instance=ExtResource("5_x8f87")]
+offset_left = -14.0
+offset_top = -26.0
+offset_right = 166.0
+offset_bottom = 7.0
+scale = Vector2(0.16, 0.16)

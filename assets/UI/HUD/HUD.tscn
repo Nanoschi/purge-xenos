@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://od4bfapoevb2" path="res://assets/UI/HUD/Bars/ActionPointsHudBar.tscn" id="2_7lx02"]
 [ext_resource type="Theme" uid="uid://dithlwvk8vpky" path="res://assets/UI/Themes/ActionButtonTheme.tres" id="2_bx2xk"]
 [ext_resource type="Texture2D" uid="uid://0ibshv27kb18" path="res://assets/CombatScripts/Icons/move.png" id="2_ymj7e"]
+[ext_resource type="PackedScene" uid="uid://cwy3s7rmnqs8t" path="res://assets/UI/HUD/Bars/HealthPointsHudBar.tscn" id="3_tcgeh"]
 [ext_resource type="Texture2D" uid="uid://df4w3umw33e8x" path="res://assets/UI/HUD/Icons/Center.png" id="4_5scjc"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sc1dx"]
@@ -40,10 +41,14 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_sc1dx")
 
 [node name="PanelContainer" type="PanelContainer" parent="VertAlign/MenuPanel" unique_id=252973256]
-layout_mode = 0
-offset_left = 457.0
-offset_right = 970.0
-offset_bottom = 70.0
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 460.0
+offset_top = 15.0
+offset_right = 973.0
+offset_bottom = -15.0
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bx2xk")
 
 [node name="ActionButtons" type="HBoxContainer" parent="VertAlign/MenuPanel/PanelContainer" unique_id=487786831]
@@ -61,19 +66,38 @@ offset_bottom = 26.0
 text = "Remaining action points: x"
 
 [node name="ActionPointsHudBar" parent="VertAlign/MenuPanel" unique_id=1316815655 instance=ExtResource("2_7lx02")]
-layout_mode = 0
-offset_left = 95.0
-offset_top = 3.0
-offset_right = 351.0
-offset_bottom = 67.0
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 95.99998
+offset_top = -97.000015
+offset_right = 351.99997
+offset_bottom = -33.000015
+grow_vertical = 0
+rotation = -1.5707964
+scale = Vector2(0.365, 0.365)
+pivot_offset = Vector2(256, 0)
+
+[node name="HealthPointsHudBar" parent="VertAlign/MenuPanel" unique_id=501890063 instance=ExtResource("3_tcgeh")]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.18
+anchor_right = 0.19900002
+anchor_bottom = 1.0
+offset_left = 63.0
+offset_top = 17.0
+offset_right = 0.5999756
+offset_bottom = -35.0
+grow_vertical = 2
 
 [node name="BtnResetCamera" type="Button" parent="VertAlign/MenuPanel" unique_id=913335133]
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 0
 offset_left = 383.0
-offset_top = 3.0
+offset_top = 18.0
 offset_right = 447.0
-offset_bottom = 67.0
+offset_bottom = 82.0
 size_flags_horizontal = 4
 tooltip_text = "Reset Camera"
 theme = ExtResource("2_bx2xk")

@@ -2,6 +2,7 @@ extends Marker2D
 class_name BaseCharacter
 
 @onready var action_point_bar = $ActionPointsBar as ActionPointsBar
+@onready var health_point_bar = $HealthPointsBar as HealthPointsBar
 @onready var sprite = $AnimatedSprite2D
 
 @export var current_cell : Vector2i:
@@ -15,9 +16,16 @@ class_name BaseCharacter
 	get:
 		return current_cell
 
+@export var max_health: int = 10
+@export var max_action_count: int = 3
+@export var show_action_bar : bool = true
+@export var show_health_bar : bool = true
+
+var health: int = max_health
 var base_map: BaseMap		
 var Direction : Directions.Points = Directions.Points.EAST
 var combat_actions : Dictionary[CombatAction.ActionType, CombatAction]
+
 
 var selected_action : CombatAction:
 	set(value):		
@@ -53,13 +61,12 @@ const DIRECTION_SUFFIXES: = {
 	Directions.Points.WEST: "_W",
 }
 
-
-# Called when the node enters the scene tree for the first time.
-#func _ready() -> void:
-	#var current_pixel_pos = MapHelpers.cell_to_pixel(current_cell)
-	#self.position = current_pixel_pos
-	#base_map.pathfind.add_character(current_cell)
-
+func _ready() -> void:
+	if not show_action_bar:
+		action_point_bar.visible = false
+	if not show_health_bar:
+		health_point_bar.visible = false
+	health_point_bar.set_max_points(max_health)
 
 func _on_battle_started():
 		Log.debug("Battle started, character %s can start acting" % str(self))
