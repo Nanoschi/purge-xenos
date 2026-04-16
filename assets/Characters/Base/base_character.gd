@@ -62,11 +62,13 @@ const DIRECTION_SUFFIXES: = {
 }
 
 func _ready() -> void:
+	health = max_health
 	if not show_action_bar:
 		action_point_bar.visible = false
 	if not show_health_bar:
 		health_point_bar.visible = false
 	health_point_bar.set_max_points(max_health)
+	health_point_bar.set_points(health)
 
 func _on_battle_started():
 		Log.debug("Battle started, character %s can start acting" % str(self))
@@ -92,10 +94,24 @@ func move_delta(delta_cells : Vector2i):
 	var path = base_map.get_astar_path(current_cell, target)
 	move(path)	
 
+func take_damage(amount: int) -> void:
+	health -= amount
+	health = max(0, health)
+	health_point_bar.set_points(health)
+	Log.debug("'%s' took %d damage, health is now %d/%d" % [self, amount, health, max_health])
+	if health <= 0:
+		Log.debug("'%s' has been defeated!" % [self])
+		queue_free()
+
 func execute_deal_damage(targeted_cells : Array[Vector2i], damage : int):
 	if damage == 0:
 		return
 	action_count -= selected_action.cost
+	for cell in targeted_cells:
+		for child in base_map.get_children():
+			var character := child as BaseCharacter
+			if character != null and character != self and character.current_cell == cell:
+				character.take_damage(damage)
 
 func execute_move(target: Vector2i):
 	if is_moving:
