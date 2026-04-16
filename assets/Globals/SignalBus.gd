@@ -17,6 +17,7 @@ signal after_action_executed(character : BaseCharacter, action : CombatAction)
 signal hud_camera_resetted
 
 signal display_line_of_sight(character : BaseCharacter, area2d : Area2D)
+signal hide_line_of_sight(character : BaseCharacter)
 signal display_range(character : BaseCharacter, range : int)
 
 @warning_ignore_restore("unused_signal")

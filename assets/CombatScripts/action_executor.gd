@@ -13,6 +13,7 @@ func execute(owner: BaseCharacter) -> void:
 			owner.execute_move(sliced_path[-1])
 			await owner.move_finished
 		if action.projectile_scene and action.targeted_cells.size() > 0:
+			SignalBus.hide_line_of_sight.emit(owner)
 			for cell in action.targeted_cells:
 				var bullet = action.projectile_scene.instantiate()
 				owner.get_parent().add_child(bullet)

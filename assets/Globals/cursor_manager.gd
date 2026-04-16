@@ -89,6 +89,7 @@ func _ready() -> void:
 	SignalBus.battle_driver_initialized.connect(func(driver): battle_driver = driver)
 	SignalBus.on_all_characters_spawned.connect(_on_all_characters_spawned)
 	SignalBus.display_line_of_sight.connect(_on_display_line_of_sight)
+	SignalBus.hide_line_of_sight.connect(_hide_line_of_sight)
 	SignalBus.enemy_selected_action.connect(_on_enemy_selected_action)
 	
 func _process(_delta: float) -> void:
