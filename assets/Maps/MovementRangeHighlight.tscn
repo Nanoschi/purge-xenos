@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://8uucxsticgdo"]
+
+[ext_resource type="Shader" uid="uid://c345ej03vklh7" path="res://assets/Materials/floor_highlight.gdshader" id="1_06f4p"]
+[ext_resource type="Texture2D" uid="uid://cx3yjm8epnm8v" path="res://assets/Materials/tile_highlight_rect_full_texture.png" id="2_wto8l"]
+[ext_resource type="Script" uid="uid://d2gco2pkvwcri" path="res://assets/Maps/tile_highlight.gd" id="3_wto8l"]
+[ext_resource type="Texture2D" uid="uid://c8488yjqeubvr" path="res://assets/Materials/tile_highlight_top_border.png" id="4_06f4p"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wto8l"]
+shader = ExtResource("1_06f4p")
+shader_parameter/border_texture = ExtResource("4_06f4p")
+shader_parameter/color = Color(0, 0.8627451, 0, 1)
+shader_parameter/border_color = Color(0, 0.97178346, 0, 1)
+shader_parameter/pulse_speed = 1.0
+shader_parameter/is_pulsing = false
+shader_parameter/opacity = 0.4
+
+[node name="TileHighlight" type="Sprite2D" unique_id=1758861644]
+z_index = 1
+material = SubResource("ShaderMaterial_wto8l")
+instance_shader_parameters/needs_bottom_border = true
+instance_shader_parameters/needs_left_border = true
+instance_shader_parameters/needs_right_border = true
+instance_shader_parameters/needs_top_border = true
+texture = ExtResource("2_wto8l")
+script = ExtResource("3_wto8l")

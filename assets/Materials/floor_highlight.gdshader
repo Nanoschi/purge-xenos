@@ -1,10 +1,17 @@
 shader_type canvas_item;
 
-uniform sampler2D overlay_texture: repeat_enable, filter_nearest;
+//uniform sampler2D overlay_texture: repeat_enable, filter_nearest;
+uniform sampler2D border_texture: repeat_enable, filter_nearest;
 uniform vec4 color : source_color;
+uniform vec4 border_color : source_color;
 uniform float pulse_speed = 1.0;
 uniform bool is_pulsing = false;
 uniform float opacity = 0.4;
+uniform float border_opacity = 0.8;
+instance uniform bool needs_top_border;
+instance uniform bool needs_right_border;
+instance uniform bool needs_bottom_border;
+instance uniform bool needs_left_border;
 
 varying vec2 vertex_position;
 
@@ -12,26 +19,40 @@ void vertex() {
 	vertex_position.xy = VERTEX;
 }
 
-float get_falloff_factor(vec2 position) {
-	vec2 center_dist = vec2(
-		abs(position.x) - 5.1,
-		abs(position.y) - 5.1
-	);
-	
-	float max_dist = max(center_dist.x, center_dist.y);
-	
-	return pow(1.0 / (max_dist * 1.3), 1.5);
-}
-
 void fragment() {
 	float pulse_factor = 1.0;
 	if(is_pulsing){
 	 	pulse_factor = pow(sin(TIME * pulse_speed), 2);	
 	}
-	vec4 tex_color = texture(overlay_texture, UV * 1.0f);
-	vec4 shifted_color = tex_color * color;
+	vec4 tex_color = texture(TEXTURE, UV * 1.0f);
+	vec4 shifted_color = tex_color * color * opacity;
+	
+	if(needs_top_border){
+		vec4 tex_border_color = texture(border_texture, UV);
+		if(tex_border_color.a > 0.0) {
+			shifted_color = tex_border_color * border_color * border_opacity;	
+		}
+	}
+	if(needs_bottom_border){
+		vec4 tex_border_color = texture(border_texture, vec2(UV.x, 1.0 - UV.y));
+		if(tex_border_color.a > 0.0) {
+			shifted_color = tex_border_color * border_color * border_opacity;;	
+		}
+	}
+	if(needs_right_border){
+		vec4 tex_border_color = texture(border_texture, vec2(-UV.y, 1.0 - UV.x));
+		if(tex_border_color.a > 0.0) {
+			shifted_color = tex_border_color * border_color * border_opacity;;	
+		}
+	}
+	if(needs_left_border){
+		vec4 tex_border_color = texture(border_texture, vec2(-UV.y, UV.x));
+		if(tex_border_color.a > 0.0) {
+			shifted_color = tex_border_color * border_color * border_opacity;;	
+		}
+	}
+	
 	COLOR = vec4(
 	shifted_color.xyz, 
-	//shifted_color.a * pulse_factor * opacity * get_falloff_factor(vertex_position));
-	shifted_color.a * pulse_factor * opacity * 1.0);
+	shifted_color.a * pulse_factor);
     }

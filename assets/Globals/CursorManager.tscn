@@ -1,17 +1,14 @@
 [gd_scene format=3 uid="uid://brlpotssmlyo8"]
 
 [ext_resource type="Script" uid="uid://dwwt8xxhmunnb" path="res://assets/Globals/cursor_manager.gd" id="1_dfugi"]
-[ext_resource type="PackedScene" uid="uid://dqh4254o3w1d6" path="res://assets/Maps/TileHighlight.tscn" id="2_c415x"]
 
 [node name="CursorManager" type="Node" unique_id=443503343]
 script = ExtResource("1_dfugi")
-
-[node name="TileHighlight" parent="." unique_id=1758861644 instance=ExtResource("2_c415x")]
-visible = false
-position = Vector2(0, -21)
 
 [node name="PathDots" type="Node" parent="." unique_id=1588290547]
 
 [node name="AttackDots" type="Node" parent="." unique_id=1636057666]
 
 [node name="AttackLines" type="Node" parent="." unique_id=1777834356]
+
+[node name="MovementRangeTiles" type="Node" parent="." unique_id=1721261386]
