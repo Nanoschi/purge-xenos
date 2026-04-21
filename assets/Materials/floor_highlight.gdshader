@@ -1,6 +1,5 @@
 shader_type canvas_item;
 
-//uniform sampler2D overlay_texture: repeat_enable, filter_nearest;
 uniform sampler2D border_texture: repeat_enable, filter_nearest;
 uniform vec4 color : source_color;
 uniform vec4 border_color : source_color;

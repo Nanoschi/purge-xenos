@@ -1,16 +1,21 @@
 [gd_scene format=3 uid="uid://dxx5ytoymhb4r"]
 
 [ext_resource type="Shader" uid="uid://5cw8hvwe4d28" path="res://assets/Materials/path_highlight.gdshader" id="1_bi8vu"]
+[ext_resource type="Texture2D" uid="uid://c2hlkloi7i046" path="res://assets/Materials/right_arrow.png" id="2_q3wod"]
+[ext_resource type="Script" uid="uid://e6qoi8sfpvb0" path="res://assets/Maps/path_highlight.gd" id="3_w1mca"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_q3wod"]
 shader = ExtResource("1_bi8vu")
-shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/color = Color(0, 1, 0, 0.7411765)
+shader_parameter/invalid_color = Color(0.85882354, 0, 0, 0.70980394)
 shader_parameter/pulse_speed = 3.0
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_w1mca"]
-size = Vector2(32, 32)
+shader_parameter/is_pulsing = false
+shader_parameter/opacity = 0.8
 
 [node name="Sprite2D" type="Sprite2D" unique_id=1009031040]
 z_index = 1
 material = SubResource("ShaderMaterial_q3wod")
-texture = SubResource("PlaceholderTexture2D_w1mca")
+instance_shader_parameters/direction = 0
+instance_shader_parameters/is_valid = true
+texture = ExtResource("2_q3wod")
+script = ExtResource("3_w1mca")

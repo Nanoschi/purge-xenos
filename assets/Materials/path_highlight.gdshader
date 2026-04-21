@@ -1,21 +1,54 @@
 shader_type canvas_item;
 
-uniform vec3 color : source_color;
+uniform vec4 color : source_color;
+uniform vec4 invalid_color : source_color;
 uniform float pulse_speed = 3.0;
+uniform bool is_pulsing = false;
+uniform float opacity = 0.8;
 
-float get_edge_dist(vec2 uv, float radius) {
-	return min(max(distance(uv, vec2(4.0, 4.0)) - radius, 0.0), 1.0);
+instance uniform bool is_valid;
+
+/**
+* 0 = east, 1 = west, 2 = south, 3 = north 
+*/
+instance uniform int direction = 0;
+
+varying vec2 vertex_position;
+
+void vertex() {
+	vertex_position.xy = VERTEX;
+	
 }
 
 void fragment() {
-	float pulse = pow(sin(TIME * pulse_speed), 2);
-	float radius = 2.0 + pulse * 0.4;
-	float center_dist = distance(UV, vec2(4.0, 4.0));
-	COLOR.xyz = color;
-	float alpha = 1.0 - get_edge_dist(UV, radius);
-	COLOR.a = pow(alpha, 3);
+	float pulse_factor = 1.0;
 	
-	if (distance(UV, vec2(4.0, 4.0)) > 1.0) {
-		COLOR.xyz *= 0.9;
+	if(is_pulsing){
+	 	pulse_factor = pow(sin(TIME * pulse_speed), 2);	
 	}
+	vec4 tex_color = texture(TEXTURE, UV);
+	vec4 shifted_color;
+	
+	if(direction == 0){
+		tex_color = texture(TEXTURE, UV);
+	}else if(direction == 1){
+		tex_color = texture(TEXTURE, vec2(1.0 - UV.x, UV.y)) ;
+	}
+	else if(direction == 2){
+		tex_color = texture(TEXTURE, vec2(UV.y, UV.x)) ;
+	}
+	else if(direction == 3){
+		tex_color = texture(TEXTURE,vec2(1.0 - UV.y, 1.0 - UV.x)) ;
+	}
+	
+	if(is_valid) {
+		shifted_color = tex_color * color * opacity;	
+	}else {
+		shifted_color = tex_color * invalid_color * opacity;
+	}
+	
+	
+	COLOR = vec4(
+		shifted_color.xyz, 
+		shifted_color.a * pulse_factor);
 }

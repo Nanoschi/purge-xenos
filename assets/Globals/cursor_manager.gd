@@ -9,10 +9,9 @@ extends Node
 @onready var movement_range_tiles = $MovementRangeTiles
 
 var _is_cell_targeted = false
-var _current_targeted_cell: Vector2i
+var _current_targeted_cell: Vector2i 
 
 const PATH_HIGHLIGHT_SCENE = preload("res://assets/Maps/PathHighlight.tscn")
-const PATH_HIGHLIGHT_SHADER = preload("res://assets/Materials/path_highlight.gdshader")
 const TILE_HIGHLIGHT_SCENE = preload("res://assets/Maps/TileHighlight.tscn")
 const MOVEMENT_RANGE_HIGHLIGHT_SCENE = preload("res://assets/Maps/MovementRangeHighlight.tscn")
 const ATTACK_HIGHLIGHT_SCENE = preload("res://assets/Maps/AttackHighlight.tscn")
@@ -20,10 +19,6 @@ const ATTACK_HIGHLIGHT_SCENE = preload("res://assets/Maps/AttackHighlight.tscn")
 const DOT_COLOR_REACHABLE = Vector3(1, 1, 0)
 const DOT_COLOR_UNREACHABLE = Vector3(1, 0, 0)
 
-# Threat overlay colors: tier 1 movement (orange), tier 2+ movement (red), attack range (purple)
-#const THREAT_COLOR_TIER1 = Color(1.0, 0.45, 0.0, 1.0)
-#const THREAT_COLOR_TIER2 = Color(0.85, 0.1, 0.1, 1.0)
-#const THREAT_COLOR_ATTACK = Color(0.65, 0.0, 0.85, 1.0)
 
 var dot_material_reachable = ShaderMaterial.new()
 var dot_material_unreachable = ShaderMaterial.new()
@@ -35,14 +30,9 @@ var attack_dots_dict : Dictionary[BaseCharacter, Array] = {}
 var attack_lines_dict : Dictionary[BaseCharacter, Line2D] = {}
 var tile_highlight : Node
 
-
-# var _mat_threat_tier1: ShaderMaterial
-# var _mat_threat_tier2: ShaderMaterial
-# var _mat_threat_attack: ShaderMaterial
 var _hovering_enemy: BaseCharacter = null
 var _move_threat_tiles: Array = []
 var _attack_threat_tiles: Array = []
-#var _threat_container: Node2D
 
 var _threat_cells: Array[Vector2i] = []
 
@@ -185,15 +175,21 @@ func _update_path_dots(character : BaseCharacter, path: Array[Vector2i], movemen
 				path_dots.add_child(dot)
 				
 		for i in path_dots_dict[character].size():
-			var dot = path_dots_dict[character][i - 1] as Node2D
+			var dot = path_dots_dict[character][i - 1] as PathHighlight
 			if i < path.size() - 1:
 				dot.visible = true
 				dot.position = MapHelpers.cell_to_pixel(path[i + 1])
-				var material = dot.material as ShaderMaterial
+				var diff = path[i + 1] - path[i]
+				var dir: int
+				if diff.x > 0: dir = 0
+				elif diff.x < 0: dir = 1
+				elif diff.y > 0: dir = 2
+				else: dir = 3
+				dot.set_direction(dir)
 				if i < movement_points:
-					dot.material = dot_material_reachable
+					dot.set_valid(true)
 				else:
-					dot.material = dot_material_unreachable
+					dot.set_valid(false)	
 			else:
 				dot.visible = false
 
@@ -202,7 +198,6 @@ func _on_after_action_executed(character : BaseCharacter, action : CombatAction)
 			for child in attack_dots_dict[character]:
 				(child as Node2D).visible = false
 
-## Shows tier 1 movement range for [param enemy].
 func _refresh_enemy_threat(enemy: BaseCharacter) -> void:
 	_clear_enemy_threat()
 
@@ -251,18 +246,6 @@ func _get_or_create_move_threat_tile() -> Node2D:
 	movement_range_tiles.add_child(tile)
 	_move_threat_tiles.append(tile)
 	return tile
-
-# func _get_or_create_attack_threat_tile() -> Node2D:
-# 	for tile in _attack_threat_tiles:
-# 		var n = tile as Node2D
-# 		if not n.visible:
-# 			return n
-# 	var tile = ATTACK_RANGE_HIGHLIGHT_SCENE.instantiate() as Node2D
-# 	tile.material = _mat_threat_attack
-# 	tile.visible = false
-# 	movement_range_tiles.add_child(tile)
-# 	_attack_threat_tiles.append(tile)
-# 	return tile
 
 func display_attack_highlight(character : BaseCharacter, target_cell : Vector2i):
 	#if character.selected_action.damage == 0:
