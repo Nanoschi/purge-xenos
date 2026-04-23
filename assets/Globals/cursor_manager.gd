@@ -41,6 +41,20 @@ var _action_target_icon_nodes: Array = []
 var _previewed_action: CombatAction = null
 var _selected_action_prev: CombatAction = null
 
+# ── Ghost preview state ──────────────────────────────────────────────────────
+## True while waiting for a second click to confirm a movement.
+var _preview_mode: bool = false
+var _preview_cell: Vector2i = Vector2i(-1, -1)
+var _preview_character: BaseCharacter = null
+## Semi-transparent clone of the player sprite shown at the target cell.
+var _ghost_sprite: AnimatedSprite2D = null
+var _ghost_container: Node2D = null
+## Orange LoS lines drawn from each enemy that can see the preview position.
+var _enemy_los_preview_lines: Array[Line2D] = []
+var _enemy_los_container: Node2D = null
+## Dimmer cursor-following path shown alongside the locked ghost path.
+var _cursor_path_dots: Array = []
+
 func _ready() -> void:
 	tile_highlight = TILE_HIGHLIGHT_SCENE.instantiate();
 
@@ -52,6 +66,14 @@ func _ready() -> void:
 	SignalBus.enemy_selected_action.connect(_on_enemy_selected_action)
 	SignalBus.action_button_hovered.connect(_on_action_button_hovered)
 	SignalBus.action_button_hover_ended.connect(_on_action_button_hover_ended)
+
+	_ghost_container = Node2D.new()
+	_ghost_container.z_index = 5
+	add_child(_ghost_container)
+
+	_enemy_los_container = Node2D.new()
+	_enemy_los_container.z_index = 4
+	add_child(_enemy_los_container)
 	
 func _process(_delta: float) -> void:
 	if base_map == null:
@@ -86,6 +108,8 @@ func _process(_delta: float) -> void:
 		var sel: CombatAction = battle_driver.current_character.selected_action
 		if sel != _selected_action_prev:
 			_selected_action_prev = sel
+			if _preview_mode:
+				_exit_preview_mode()
 			if _previewed_action == null:
 				if sel != null:
 					_refresh_action_target_icons(battle_driver.current_character, sel)
@@ -124,14 +148,52 @@ func _display_selected_action(event: InputEvent):
 			if event is InputEventMouse:
 				var mouse_pos = base_map.map_floor.get_local_mouse_position()
 				var target_cell = MapHelpers.pixel_to_cell(mouse_pos)
-				
-				display_path_dots(character, target_cell)
-				display_attack_highlight(character, target_cell)
-				
-				if event.button_mask & MouseButton.MOUSE_BUTTON_LEFT:
-					battle_driver.current_character.execute_action(target_cell)
-					if battle_driver.current_character.is_moving:
-						_update_path_dots(character, [])
+
+				# In preview mode show a dimmer cursor-following path alongside
+				# the locked ghost path; otherwise follow cursor normally.
+				if not _preview_mode:
+					display_path_dots(character, target_cell)
+					display_attack_highlight(character, target_cell)
+				else:
+					if character.selected_action != null and character.selected_action.movement > 0 \
+							and base_map.is_tile_walk_selectable(target_cell):
+						_update_cursor_path_dots(character.get_preferred_path_to(target_cell), character.selected_action.movement)
+					else:
+						for dot in _cursor_path_dots:
+							(dot as Node2D).visible = false
+
+				if event is InputEventMouseButton and event.pressed:
+					if event.button_index == MOUSE_BUTTON_RIGHT:
+						if _preview_mode:
+							_exit_preview_mode()
+						return
+
+				if event is InputEventMouseButton and event.pressed \
+						and event.button_index == MOUSE_BUTTON_LEFT:
+					var sel_action = character.selected_action
+					# Two-click movement: first click → preview, second click on
+					# the same cell → execute. Different cell → update preview.
+					if sel_action != null and sel_action.movement > 0 \
+							and base_map.is_tile_walk_selectable(target_cell):
+						var path_to_target = character.get_preferred_path_to(target_cell)
+						var in_range = path_to_target.size() > 0 \
+								and path_to_target.size() - 1 <= sel_action.movement
+						if in_range:
+							if not _preview_mode:
+								_enter_preview_mode(character, target_cell)
+							elif target_cell == _preview_cell:
+								_exit_preview_mode()
+								character.execute_action(target_cell)
+								if character.is_moving:
+									_update_path_dots(character, [])
+							else:
+								_exit_preview_mode()
+								_enter_preview_mode(character, target_cell)
+					else:
+						# Non-movement action: execute immediately as before.
+						character.execute_action(target_cell)
+						if character.is_moving:
+							_update_path_dots(character, [])
 
 func _on_enemy_selected_action(enemy : BaseCharacter, action : CombatAction):
 	Log.debug("Show action of enemy: %s" % str(action.display_name))
@@ -216,6 +278,7 @@ func _update_path_dots(character : BaseCharacter, path: Array[Vector2i], movemen
 
 func _on_after_action_executed(character : BaseCharacter, _action : CombatAction):
 		if character == battle_driver.current_character:
+			_exit_preview_mode()
 			for child in attack_dots_dict[character]:
 				(child as Node2D).visible = false
 			_selected_action_prev = null
@@ -292,6 +355,11 @@ func _refresh_action_target_icons(character: BaseCharacter, action: CombatAction
 	if action.icon == null:
 		return
 
+	# When previewing a move, evaluate reachability and LoS from the ghost cell.
+	var from_cell: Vector2i = _preview_cell \
+		if (_preview_mode and character == _preview_character) \
+		else character.current_cell
+
 	var target_cells: Array[Vector2i] = []
 
 	if EnumHelpers.has_flag(action.valid_target_flags, CombatAction.ValidTargetFlags.OPPONENTS):
@@ -300,11 +368,11 @@ func _refresh_action_target_icons(character: BaseCharacter, action: CombatAction
 			if not is_instance_valid(opp):
 				continue
 			if action.weapon_range > 0:
-				var dist := maxi(abs(opp.current_cell.x - character.current_cell.x), abs(opp.current_cell.y - character.current_cell.y))
+				var dist := maxi(abs(opp.current_cell.x - from_cell.x), abs(opp.current_cell.y - from_cell.y))
 				if dist > action.weapon_range:
 					continue
 			if action.needs_line_of_sight:
-				if base_map.get_line_of_sight(character.current_cell, opp.current_cell, true, true).size() == 0:
+				if base_map.get_line_of_sight(from_cell, opp.current_cell, true, true).size() == 0:
 					continue
 			target_cells.append(opp.current_cell)
 
@@ -318,16 +386,16 @@ func _refresh_action_target_icons(character: BaseCharacter, action: CombatAction
 			if not is_instance_valid(member) or member == character:
 				continue
 			if action.weapon_range > 0:
-				var dist := maxi(abs(member.current_cell.x - character.current_cell.x), abs(member.current_cell.y - character.current_cell.y))
+				var dist := maxi(abs(member.current_cell.x - from_cell.x), abs(member.current_cell.y - from_cell.y))
 				if dist > action.weapon_range:
 					continue
 			if action.needs_line_of_sight:
-				if base_map.get_line_of_sight(character.current_cell, member.current_cell, true, true).size() == 0:
+				if base_map.get_line_of_sight(from_cell, member.current_cell, true, true).size() == 0:
 					continue
 			target_cells.append(member.current_cell)
 
 	if EnumHelpers.has_flag(action.valid_target_flags, CombatAction.ValidTargetFlags.SELF):
-		target_cells.append(character.current_cell)
+		target_cells.append(from_cell)
 
 	var icon_size := action.icon.get_size()
 	var cell_size := Vector2(MapHelpers.cell_size)
@@ -384,3 +452,108 @@ func display_attack_highlight(character : BaseCharacter, target_cell : Vector2i)
 	elif attack_dots_dict[character].size() > 0:
 		for child in attack_dots_dict[character]:
 			(child as Node2D).visible = false
+
+# ── Ghost / movement-preview helpers ─────────────────────────────────────────
+
+func _enter_preview_mode(character: BaseCharacter, cell: Vector2i) -> void:
+	_preview_mode = true
+	_preview_cell = cell
+	_preview_character = character
+	# Hide stale enemy-turn LoS lines so only the orange preview lines are shown.
+	for line in attack_lines_dict.values():
+		(line as Line2D).visible = false
+	# Clear cursor dots and lock main path to the ghost destination.
+	for dot in _cursor_path_dots:
+		(dot as Node2D).visible = false
+	if character.selected_action != null:
+		_update_path_dots(character, character.get_preferred_path_to(cell), character.selected_action.movement)
+	_show_ghost_at(cell, character)
+	_update_enemy_los_preview(cell)
+	if character.selected_action != null:
+		_refresh_action_target_icons(character, character.selected_action)
+
+func _exit_preview_mode() -> void:
+	_preview_mode = false
+	_preview_cell = Vector2i(-1, -1)
+	_preview_character = null
+	if _ghost_sprite != null:
+		_ghost_sprite.visible = false
+	_clear_enemy_los_preview()
+	for dot in _cursor_path_dots:
+		(dot as Node2D).visible = false
+
+func _show_ghost_at(cell: Vector2i, character: BaseCharacter) -> void:
+	if _ghost_sprite == null:
+		_ghost_sprite = AnimatedSprite2D.new()
+		_ghost_sprite.z_index = 5
+		_ghost_container.add_child(_ghost_sprite)
+	_ghost_sprite.sprite_frames = character.sprite.sprite_frames
+	var suffix: String = BaseCharacter.DIRECTION_SUFFIXES.get(character.Direction, "_E")
+	_ghost_sprite.play("idle_no_weapon" + suffix)
+	_ghost_sprite.position = MapHelpers.cell_to_pixel(cell)
+	_ghost_sprite.modulate = Color(0.6, 0.8, 1.0, 0.5)
+	_ghost_sprite.visible = true
+
+func _update_enemy_los_preview(ghost_cell: Vector2i) -> void:
+	_clear_enemy_los_preview()
+	if battle_driver == null:
+		return
+	for enemy in battle_driver.Enemies:
+		if not is_instance_valid(enemy):
+			continue
+		var los = base_map.get_line_of_sight(enemy.current_cell, ghost_cell, true, false)
+		if los.size() > 0:
+			var line = _get_or_create_enemy_los_preview_line()
+			line.clear_points()
+			line.add_point(MapHelpers.cell_to_pixel(enemy.current_cell))
+			line.add_point(MapHelpers.cell_to_pixel(ghost_cell))
+			line.visible = true
+
+func _clear_enemy_los_preview() -> void:
+	for line in _enemy_los_preview_lines:
+		(line as Line2D).visible = false
+
+func _get_or_create_enemy_los_preview_line() -> Line2D:
+	for line in _enemy_los_preview_lines:
+		var l = line as Line2D
+		if not l.visible:
+			return l
+	var line = Line2D.new()
+	line.z_index = 4
+	line.width = 1.0
+	line.default_color = Color.RED
+	line.visible = false
+	_enemy_los_container.add_child(line)
+	_enemy_los_preview_lines.append(line)
+	return line
+
+func _update_cursor_path_dots(path: Array[Vector2i], movement_points: int) -> void:
+	if path.size() == 0:
+		for dot in _cursor_path_dots:
+			(dot as Node2D).visible = false
+		return
+
+	while _cursor_path_dots.size() < path.size() - 1:
+		var dot = PATH_HIGHLIGHT_SCENE.instantiate() as Node2D
+		dot.modulate.a = 0.4
+		path_dots.add_child(dot)
+		_cursor_path_dots.append(dot)
+
+	for i in _cursor_path_dots.size():
+		var dot = _cursor_path_dots[i - 1] as PathHighlight
+		if i < path.size() - 1:
+			dot.visible = true
+			dot.position = MapHelpers.cell_to_pixel(path[i + 1])
+			var diff = path[i + 1] - path[i]
+			var dir: int
+			if diff.x > 0: dir = 0
+			elif diff.x < 0: dir = 1
+			elif diff.y > 0: dir = 2
+			else: dir = 3
+			dot.set_direction(dir)
+			if i < movement_points:
+				dot.set_valid(true)
+			else:
+				dot.set_valid(false)
+		else:
+			dot.visible = false
